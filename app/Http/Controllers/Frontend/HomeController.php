@@ -30,6 +30,21 @@ class HomeController extends Controller
                 'role' => 'Registered Nurse',
                 'content' => 'New Horizon Healthcare has been instrumental in advancing my nursing career...'
             ],
+            [
+                'name' => 'John Doe',
+                'role' => 'Healthcare Assistant',
+                'content' => 'I have been working with New Horizon Healthcare for over 5 years now and I am very happy with the support and opportunities...'
+            ],
+            [
+                'name' => 'Jane Smith',
+                'role' => 'Support Worker',
+                'content' => 'I have been working with New Horizon Healthcare for over 5 years now and I am very happy with the support and opportunities...'
+            ],
+            [
+                'name' => 'Alice Brown',
+                'role' => 'Registered Nurse',
+                'content' => 'New Horizon Healthcare has been instrumental in advancing my nursing career...'
+            ],
             // Add more testimonials...
         ];
     }
