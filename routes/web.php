@@ -1,36 +1,110 @@
 <?php
 
-use App\Http\Controllers\Frontend\HomeController;
-use App\Http\Controllers\Frontend\AboutController;
-use App\Http\Controllers\Frontend\ServiceController;
-use App\Http\Controllers\Frontend\ContactController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\FaviconController;
+use App\Http\Controllers\Frontend\{
+    HomeController,
+    AboutController,
+    ServiceController,
+    ContactController
+};
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Auth\{
+    LoginController,
+    RegisterController,
+    ForgotPasswordController,
+    ResetPasswordController
+};
+use App\Http\Controllers\FaviconController;
 use Illuminate\Support\Facades\Route;
 
-// Frontend Routes
-Route::get('/', [HomeController::class, 'index']);
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+/*
+|--------------------------------------------------------------------------
+| Frontend Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/services', [ServiceController::class, 'index'])->name('services');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-// Authentication Routes
-Auth::routes(['verify' => true]);
+// Favicon
+Route::get('/favicon.svg', [FaviconController::class, 'svg']);
 
-// Admin Routes
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::resource('users', Admin\UserController::class);
-    Route::resource('shifts', Admin\ShiftController::class);
-    Route::resource('courses', Admin\CourseController::class);
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
+Auth::routes(['verify' => true, 'register' => true]); // Enable registration for healthcare professionals
+
+/*
+|--------------------------------------------------------------------------
+| Healthcare Professional Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     
-    // Reports
-    Route::get('/reports/shifts', [Admin\ReportController::class, 'shifts'])->name('admin.reports.shifts');
-    Route::get('/reports/users', [Admin\ReportController::class, 'users'])->name('admin.reports.users');
+    // Documents
+    Route::resource('documents', DocumentController::class);
+    
+    // Available Shifts
+    Route::get('/available-shifts', [ShiftController::class, 'available'])->name('shifts.available');
+    Route::post('/shifts/{shift}/apply', [ShiftController::class, 'apply'])->name('shifts.apply');
+    
+    // My Shifts
+    Route::get('/my-shifts', [ShiftController::class, 'myShifts'])->name('shifts.my');
+    Route::post('/shifts/{shift}/check-in', [ShiftController::class, 'checkIn'])->name('shifts.check-in');
+    Route::post('/shifts/{shift}/check-out', [ShiftController::class, 'checkOut'])->name('shifts.check-out');
+    
+    // Training & Courses
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+    Route::post('/courses/{course}/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')
+    ->middleware(['auth', 'admin'])
+    ->name('admin.')
+    ->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
+        
+        // Admin Management (Super Admin Only)
+        Route::middleware(['super_admin'])->group(function () {
+            Route::resource('admins', Admin\AdminController::class);
+        });
+        
+        // User Management
+        Route::resource('users', Admin\UserController::class);
+        Route::post('users/{user}/verify-documents', [Admin\UserController::class, 'verifyDocuments'])
+            ->name('users.verify-documents');
+        
+        // Shift Management
+        Route::resource('shifts', Admin\ShiftController::class);
+        Route::post('shifts/{shift}/assign', [Admin\ShiftController::class, 'assign'])->name('shifts.assign');
+        Route::get('shifts/{shift}/track', [Admin\ShiftController::class, 'track'])->name('shifts.track');
+        
+        // Course Management
+        Route::resource('courses', Admin\CourseController::class);
+        Route::get('courses/{course}/enrollments', [Admin\CourseController::class, 'enrollments'])
+            ->name('courses.enrollments');
+        
+        // Reports
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/shifts', [Admin\ReportController::class, 'shifts'])->name('shifts');
+            Route::get('/users', [Admin\ReportController::class, 'users'])->name('users');
+            Route::get('/courses', [Admin\ReportController::class, 'courses'])->name('courses');
+            Route::get('/export/{type}', [Admin\ReportController::class, 'export'])->name('export');
+        });
+        
+        // Settings
+        Route::get('/settings', [Admin\SettingController::class, 'edit'])->name('settings.edit');
+        Route::put('/settings', [Admin\SettingController::class, 'update'])->name('settings.update');
+    });
