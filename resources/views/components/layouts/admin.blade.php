@@ -16,7 +16,6 @@
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-        <!-- Admin Navigation -->
         @include('layouts.admin.navigation')
 
         <!-- Page Heading -->
@@ -33,7 +32,6 @@
             {{ $slot }}
         </main>
 
-        <!-- Admin Footer -->
         @include('layouts.admin.footer')
     </div>
 </body>

@@ -80,7 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')
-    ->middleware(['auth', 'admin'])
+    ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
     ->name('admin.')
     ->group(function () {
         // Dashboard

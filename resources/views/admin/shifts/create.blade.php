@@ -7,7 +7,7 @@
         </div>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto my-12">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
             <form action="{{ route('admin.shifts.store') }}" method="POST" class="p-6">
                 @csrf
