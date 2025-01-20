@@ -6,111 +6,116 @@ use App\Http\Controllers\Controller;
 use App\Models\Shift;
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Services\PDFGenerator;
+use App\Http\Requests\Admin\ShiftRequest;
 
 class ShiftController extends Controller
 {
     public function index(Request $request)
     {
         $shifts = Shift::query()
+            ->with('user')
             ->when($request->status, function($query, $status) {
                 $query->where('status', $status);
             })
             ->when($request->date_from, function($query, $date) {
-                $query->where('start_datetime', '>=', $date);
+                $query->whereDate('start_datetime', '>=', $date);
             })
             ->when($request->date_to, function($query, $date) {
-                $query->where('start_datetime', '<=', $date);
+                $query->whereDate('start_datetime', '<=', $date);
             })
             ->when($request->location, function($query, $location) {
                 $query->where('location', 'like', "%{$location}%");
             })
-            ->with('user')
             ->latest('start_datetime')
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        $locations = Shift::distinct('location')->pluck('location');
-
-        return view('admin.shifts.index', compact('shifts', 'locations'));
+        return view('admin.shifts.index', [
+            'shifts' => $shifts,
+            'locations' => Shift::distinct('location')->pluck('location'),
+            'statuses' => Shift::distinct('status')->pluck('status')
+        ]);
     }
 
     public function create()
     {
-        $users = User::role('user')->get();
+        $users = User::where('is_admin', false)
+            ->where('is_active', true)
+            ->get();
+
         return view('admin.shifts.create', compact('users'));
     }
 
-    public function store(Request $request)
+    public function store(ShiftRequest $request)
     {
-        $validated = $request->validate([
-            'start_datetime' => 'required|date',
-            'end_datetime' => 'required|date|after:start_datetime',
-            'location' => 'required|string',
-            'rate_per_hour' => 'required|numeric|min:0',
-            'user_id' => 'nullable|exists:users,id',
-            'notes' => 'nullable|string',
-        ]);
+        $shift = Shift::create($request->validated());
 
-        $shift = Shift::create($validated + [
-            'status' => $request->user_id ? 'assigned' : 'open'
-        ]);
+        if ($request->user_id) {
+            // Send notification to assigned user
+            $shift->user->notify(new ShiftAssigned($shift));
+        }
 
-        return redirect()->route('admin.shifts.index')
+        return redirect()
+            ->route('admin.shifts.index')
             ->with('success', 'Shift created successfully');
     }
 
     public function show(Shift $shift)
     {
-        $shift->load('user');
+        $shift->load(['user', 'activities']);
         return view('admin.shifts.show', compact('shift'));
     }
 
     public function edit(Shift $shift)
     {
-        $users = User::role('user')->get();
-        return view('admin.shifts.edit', compact('shift', 'users'));
+        $users = User::where('is_admin', false)
+            ->where('is_active', true)
+            ->get();
+
+        return view('admin.shifts.edit', [
+            'shift' => $shift,
+            'users' => $users
+        ]);
     }
 
-    public function update(Request $request, Shift $shift)
+    public function update(ShiftRequest $request, Shift $shift)
     {
-        $validated = $request->validate([
-            'start_datetime' => 'required|date',
-            'end_datetime' => 'required|date|after:start_datetime',
-            'location' => 'required|string',
-            'rate_per_hour' => 'required|numeric|min:0',
-            'user_id' => 'nullable|exists:users,id',
-            'notes' => 'nullable|string',
-        ]);
+        $oldUserId = $shift->user_id;
+        $shift->update($request->validated());
 
-        $shift->update($validated);
+        // If user assignment changed, send notifications
+        if ($oldUserId !== $shift->user_id) {
+            if ($oldUserId) {
+                User::find($oldUserId)->notify(new ShiftUnassigned($shift));
+            }
+            if ($shift->user_id) {
+                $shift->user->notify(new ShiftAssigned($shift));
+            }
+        }
 
-        return redirect()->route('admin.shifts.show', $shift)
+        return redirect()
+            ->route('admin.shifts.show', $shift)
             ->with('success', 'Shift updated successfully');
     }
 
     public function destroy(Shift $shift)
     {
+        if ($shift->user_id) {
+            $shift->user->notify(new ShiftCancelled($shift));
+        }
+
         $shift->delete();
-        return redirect()->route('admin.shifts.index')
+
+        return redirect()
+            ->route('admin.shifts.index')
             ->with('success', 'Shift deleted successfully');
     }
 
-    public function exportPdf(Request $request, PDFGenerator $pdfGenerator)
+    public function track(Shift $shift)
     {
-        $shifts = Shift::query()
-            ->when($request->status, function($query, $status) {
-                $query->where('status', $status);
-            })
-            ->when($request->date_from, function($query, $date) {
-                $query->where('start_datetime', '>=', $date);
-            })
-            ->when($request->date_to, function($query, $date) {
-                $query->where('start_datetime', '<=', $date);
-            })
-            ->with('user')
-            ->get();
-
-        return $pdfGenerator->generateShiftReport($shifts, $request->all());
+        abort_if(!$shift->is_active, 404);
+        
+        return view('admin.shifts.track', compact('shift'));
     }
 
     public function assign(Request $request, Shift $shift)
@@ -124,6 +129,9 @@ class ShiftController extends Controller
             'status' => 'assigned'
         ]);
 
-        return redirect()->back()->with('success', 'Shift assigned successfully');
+        // Notify assigned user
+        $shift->user->notify(new ShiftAssigned($shift));
+
+        return back()->with('success', 'Shift assigned successfully');
     }
 }

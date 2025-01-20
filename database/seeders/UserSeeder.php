@@ -12,16 +12,18 @@ class UserSeeder extends Seeder
     public function run()
     {
         // Create admin role
-        Role::create(['name' => 'admin']);
+        if (!Role::where('name', 'admin')->exists()) {
+            Role::create(['name' => 'admin']);
+        }
         Role::create(['name' => 'user']);
 
         // Create admin user
         $admin = User::create([
-            'first_name' => 'Admin',
+            'first_name' => 'Regular',
             'last_name' => 'User',
-            'email' => 'admin@newhorizon.com',
-            'mobile_phone' => '07700900000',
-            'username' => 'admin',
+            'email' => 'regularadmin@newhorizon.com',
+            'mobile_phone' => '07700900002',
+            'username' => 'regularadmin',
             'password' => Hash::make('password'),
             'job_role' => 'registered_nurse',
             'dob' => '1990-01-01',

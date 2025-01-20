@@ -9,7 +9,9 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
+        if (!auth()->check() || 
+            (!auth()->user()->hasRole('admin') && 
+             !auth()->user()->hasRole('super-admin'))) {
             abort(403, 'Unauthorized access.');
         }
 

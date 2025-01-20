@@ -7,13 +7,18 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 
 class CustomVerifyEmail extends VerifyEmail
 {
-    protected function buildMailMessage($url)
+    /**
+     * Build the mail representation of the notification.
+     */
+    protected function buildMailMessage($url): MailMessage
     {
         return (new MailMessage)
-            ->subject('Verify Your Email Address - New Horizon Healthcare')
-            ->line('Welcome to New Horizon Healthcare! Please verify your email address to complete your registration.')
-            ->line('Your email verification link is valid for 60 minutes.')
+            ->subject('Welcome to New Horizon Healthcare - Please Verify Your Email')
+            ->greeting('Hello!')
+            ->line('Welcome to New Horizon Healthcare! We\'re excited to have you join our team.')
+            ->line('Please click the button below to verify your email address.')
             ->action('Verify Email Address', $url)
-            ->line('If you did not create an account, no further action is required.');
+            ->line('If you did not create an account, no further action is required.')
+            ->line('Thank you for choosing New Horizon Healthcare as your staffing partner!');
     }
 }

@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UpdateProfileRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
     public function show()
     {
         return view('profile.show', [
-            'user' => auth()->user()->load(['certifications', 'references'])
+            'user' => auth()->user()
         ]);
     }
 
@@ -29,11 +29,11 @@ class ProfileController extends Controller
         $validated = $request->validated();
 
         if ($request->hasFile('profile_photo')) {
-            $path = $request->file('profile_photo')->store('profile-photos', 'public');
             if ($user->profile_photo) {
                 Storage::disk('public')->delete($user->profile_photo);
             }
-            $validated['profile_photo'] = $path;
+            $validated['profile_photo'] = $request->file('profile_photo')
+                ->store('profile-photos', 'public');
         }
 
         $user->update($validated);
