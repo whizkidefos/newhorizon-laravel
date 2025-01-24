@@ -14,6 +14,14 @@ use App\Http\Controllers\Auth\{
     ResetPasswordController
 };
 use App\Http\Controllers\FaviconController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BankDetailsController;
+use App\Http\Controllers\WorkHistoryController;
+use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\CourseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +35,10 @@ Route::get('/services', [ServiceController::class, 'index'])->name('services');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
+// Legal Pages
+Route::view('/terms', 'legal.terms')->name('terms');
+Route::view('/privacy', 'legal.privacy')->name('privacy');
+
 // Favicon
 Route::get('/favicon.svg', [FaviconController::class, 'svg']);
 
@@ -39,22 +51,46 @@ Auth::routes(['verify' => true, 'register' => true]); // Enable registration for
 
 /*
 |--------------------------------------------------------------------------
-| Healthcare Professional Routes
+| Profile Routes
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
-    
     // Profile routes
-    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile/edit', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
-    // Documents
-    Route::resource('documents', DocumentController::class);
+    // Bank Details
+    Route::get('/profile/bank-details', [BankDetailsController::class, 'index'])->name('profile.bank-details');
+    Route::post('/profile/bank-details', [BankDetailsController::class, 'store'])->name('profile.bank-details.store');
+    Route::put('/profile/bank-details/{bankDetail}', [BankDetailsController::class, 'update'])->name('profile.bank-details.update');
     
+    // Work History
+    Route::get('/profile/work-history', [WorkHistoryController::class, 'index'])->name('profile.work-history');
+    Route::post('/profile/work-history', [WorkHistoryController::class, 'store'])->name('profile.work-history.store');
+    Route::put('/profile/work-history/{workHistory}', [WorkHistoryController::class, 'update'])->name('profile.work-history.update');
+    Route::delete('/profile/work-history/{workHistory}', [WorkHistoryController::class, 'destroy'])->name('profile.work-history.destroy');
+    
+    // Training Records
+    Route::get('/profile/trainings', [TrainingController::class, 'index'])->name('profile.trainings');
+    Route::post('/profile/trainings', [TrainingController::class, 'store'])->name('profile.trainings.store');
+    Route::put('/profile/trainings/{training}', [TrainingController::class, 'update'])->name('profile.trainings.update');
+    Route::delete('/profile/trainings/{training}', [TrainingController::class, 'destroy'])->name('profile.trainings.destroy');
+
+    // Course routes
+    Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/{course}', [CourseController::class, 'show'])->name('courses.show');
+    Route::post('/courses/{course}/enroll', [CourseController::class, 'enroll'])->name('courses.enroll');
+    Route::get('/courses/{course}/progress', [CourseController::class, 'progress'])->name('courses.progress');
+    Route::post('/courses/{course}/progress', [CourseController::class, 'updateProgress'])->name('courses.update-progress');
+
+    // Shift routes
+    Route::get('/shifts', [ShiftController::class, 'index'])->name('shifts.index');
+    Route::get('/shifts/my-shifts', [ShiftController::class, 'myShifts'])->name('shifts.my-shifts');
+    Route::post('/shifts/{shift}/book', [ShiftController::class, 'book'])->name('shifts.book');
+    Route::post('/shifts/{shift}/cancel', [ShiftController::class, 'cancel'])->name('shifts.cancel');
+
     // Available Shifts
     Route::get('/available-shifts', [ShiftController::class, 'available'])->name('shifts.available');
     Route::post('/shifts/{shift}/apply', [ShiftController::class, 'apply'])->name('shifts.apply');

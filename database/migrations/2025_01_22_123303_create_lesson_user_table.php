@@ -8,20 +8,17 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('certifications', function (Blueprint $table) {
+        Schema::create('lesson_user', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('lesson_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->boolean('status');
-            $table->date('date_passed');
-            $table->string('certificate_file')->nullable();
-            $table->date('expiry_date')->nullable();
+            $table->timestamp('completed_at');
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('certifications');
+        Schema::dropIfExists('lesson_user');
     }
 };

@@ -11,8 +11,14 @@ class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
+    protected $redirectTo = RouteServiceProvider::HOME;
     protected $maxAttempts = 5; // Maximum login attempts
     protected $decayMinutes = 15; // Lockout time in minutes
+
+    public function __construct()
+    {
+        $this->middleware('guest')->except('logout');
+    }
 
     public function login(Request $request)
     {

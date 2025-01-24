@@ -42,8 +42,8 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.show')">
-                            Profile
+                        <x-dropdown-link :href="route('profile.index')">
+                            {{ __('Profile') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -52,7 +52,7 @@
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                Log Out
+                                {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -96,7 +96,7 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.show')">
+                <x-responsive-nav-link :href="route('profile.index')">
                     Profile
                 </x-responsive-nav-link>
 

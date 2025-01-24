@@ -43,10 +43,12 @@
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('dashboard')">
-                                Dashboard
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('profile.show')">
+                            @if(auth()->user()->hasRole(['super-admin', 'admin']))
+                                <x-dropdown-link :href="route('admin.dashboard')">
+                                    Dashboard
+                                </x-dropdown-link>
+                            @endif
+                            <x-dropdown-link :href="route('profile.index')">
                                 Profile
                             </x-dropdown-link>
                             <form method="POST" action="{{ route('logout') }}">
@@ -108,10 +110,12 @@
                 </div>
 
                 <div class="mt-3 space-y-1">
-                    <x-responsive-nav-link :href="route('dashboard')">
-                        Dashboard
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('profile.show')">
+                    @if(auth()->user()->hasRole(['super-admin', 'admin']))
+                        <x-responsive-nav-link :href="route('admin.dashboard')">
+                            Dashboard
+                        </x-responsive-nav-link>
+                    @endif
+                    <x-responsive-nav-link :href="route('profile.index')">
                         Profile
                     </x-responsive-nav-link>
                     <form method="POST" action="{{ route('logout') }}">

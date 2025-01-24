@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\ProfileDetail;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -26,17 +27,25 @@ class AdminSeeder extends Seeder
                 'last_name' => 'Admin',
                 'email' => 'admin@newhorizon.com',
                 'password' => Hash::make('Admin123!@#'),
-                'mobile_phone' => '07700900001',
+                'mobile_number' => '07700900001',
                 'username' => 'superadmin',
-                'job_role' => 'registered_nurse',
-                'dob' => '1990-01-01',
+                'job_role' => 'Registered Nurse',
+                'date_of_birth' => '1990-01-01',
                 'gender' => 'male',
-                'postcode' => 'CH1 1AA',
-                'address' => '123 Admin Street',
-                'country' => 'UK',
-                'ni_number' => 'AA123456A',
+                'national_insurance_number' => 'AA123456A',
                 'nationality' => 'UK',
+                'right_to_work_uk' => true,
+                'has_enhanced_dbs' => true,
                 'email_verified_at' => now(),
+            ]);
+
+            // Create profile details
+            ProfileDetail::create([
+                'user_id' => $superAdmin->id,
+                'address_line_1' => '123 Admin Street',
+                'city' => 'Chester',
+                'postcode' => 'CH1 1AA',
+                'country' => 'UK',
             ]);
         }
 

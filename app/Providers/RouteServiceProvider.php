@@ -15,7 +15,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * Typically, users are redirected here after authentication.
      */
-    public const HOME = '/admin/dashboard';
+    public const HOME = '/';
 
     public function boot()
     {

@@ -9,10 +9,15 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    public function show()
+    public function index()
     {
-        return view('profile.show', [
-            'user' => auth()->user()
+        $user = auth()->user();
+        return view('profile.index', [
+            'user' => $user,
+            'bankDetails' => $user->bankDetails,
+            'workHistory' => $user->workHistory()->latest()->get(),
+            'trainingRecords' => $user->trainingRecords()->latest()->get(),
+            'profileDetails' => $user->profileDetails
         ]);
     }
 
@@ -36,9 +41,31 @@ class ProfileController extends Controller
                 ->store('profile-photos', 'public');
         }
 
+        if ($request->hasFile('signature')) {
+            if ($user->signature) {
+                Storage::disk('public')->delete($user->signature);
+            }
+            $validated['signature'] = $request->file('signature')
+                ->store('signatures', 'public');
+            $validated['signature_date'] = now();
+        }
+
         $user->update($validated);
 
-        return redirect()->route('profile.show')
+        if ($request->has('address_line_1')) {
+            $user->profileDetails()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'address_line_1' => $request->address_line_1,
+                    'address_line_2' => $request->address_line_2,
+                    'city' => $request->city,
+                    'postcode' => $request->postcode,
+                    'country' => $request->country,
+                ]
+            );
+        }
+
+        return redirect()->route('profile.index')
             ->with('success', 'Profile updated successfully');
     }
 
@@ -53,6 +80,7 @@ class ProfileController extends Controller
             'password' => Hash::make($validated['password'])
         ]);
 
-        return back()->with('success', 'Password updated successfully');
+        return redirect()->route('profile.index')
+            ->with('success', 'Password updated successfully');
     }
 }
