@@ -64,18 +64,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Bank Details
     Route::get('/profile/bank-details', [BankDetailsController::class, 'index'])->name('profile.bank-details');
     Route::post('/profile/bank-details', [BankDetailsController::class, 'store'])->name('profile.bank-details.store');
-    Route::put('/profile/bank-details/{bankDetail}', [BankDetailsController::class, 'update'])->name('profile.bank-details.update');
+    Route::patch('/profile/bank-details/{bankDetail}', [BankDetailsController::class, 'update'])->name('profile.bank-details.update');
     
     // Work History
     Route::get('/profile/work-history', [WorkHistoryController::class, 'index'])->name('profile.work-history');
     Route::post('/profile/work-history', [WorkHistoryController::class, 'store'])->name('profile.work-history.store');
-    Route::put('/profile/work-history/{workHistory}', [WorkHistoryController::class, 'update'])->name('profile.work-history.update');
+    Route::patch('/profile/work-history/{workHistory}', [WorkHistoryController::class, 'update'])->name('profile.work-history.update');
     Route::delete('/profile/work-history/{workHistory}', [WorkHistoryController::class, 'destroy'])->name('profile.work-history.destroy');
     
     // Training Records
     Route::get('/profile/trainings', [TrainingController::class, 'index'])->name('profile.trainings');
     Route::post('/profile/trainings', [TrainingController::class, 'store'])->name('profile.trainings.store');
-    Route::put('/profile/trainings/{training}', [TrainingController::class, 'update'])->name('profile.trainings.update');
+    Route::patch('/profile/trainings/{training}', [TrainingController::class, 'update'])->name('profile.trainings.update');
     Route::delete('/profile/trainings/{training}', [TrainingController::class, 'destroy'])->name('profile.trainings.destroy');
 
     // Course routes

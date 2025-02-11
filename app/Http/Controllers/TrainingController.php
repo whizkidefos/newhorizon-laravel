@@ -14,7 +14,7 @@ class TrainingController extends Controller
 
     public function index()
     {
-        $trainings = Training::where('user_id', auth()->id())->paginate(10);
-        return view('trainings.index', compact('trainings'));
+        $trainings = auth()->user()->trainingRecords()->latest()->get();
+        return view('profile.trainings', compact('trainings'));
     }
 }

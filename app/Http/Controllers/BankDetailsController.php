@@ -15,6 +15,6 @@ class BankDetailsController extends Controller
     public function index()
     {
         $bankDetails = BankDetail::where('user_id', auth()->id())->first();
-        return view('bank-details.index', compact('bankDetails'));
+        return view('profile.bank-details', compact('bankDetails'));
     }
 }

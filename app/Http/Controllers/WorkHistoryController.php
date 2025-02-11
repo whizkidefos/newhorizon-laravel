@@ -14,7 +14,7 @@ class WorkHistoryController extends Controller
 
     public function index()
     {
-        $workHistories = WorkHistory::where('user_id', auth()->id())->paginate(10);
-        return view('work-histories.index', compact('workHistories'));
+        $workHistory = auth()->user()->workHistory()->latest()->get();
+        return view('profile.work-history', compact('workHistory'));
     }
 }

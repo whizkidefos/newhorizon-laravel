@@ -1,5 +1,7 @@
 @extends('layouts.auth')
 
+@section('title', 'Login')
+
 @section('auth-content')
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-md mx-auto">
@@ -60,14 +62,14 @@
                         <input type="checkbox" 
                                name="remember" 
                                id="remember" 
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                               {{ old('remember') ? 'checked' : '' }}>
                         <label for="remember" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                             Remember me
                         </label>
                     </div>
-
                     <div class="text-sm">
-                        <a href="{{ route('password.request') }}" class="text-blue-600 hover:text-blue-500">
+                        <a href="{{ route('password.request') }}" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
                             Forgot your password?
                         </a>
                     </div>

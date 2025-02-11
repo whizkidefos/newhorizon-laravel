@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Mail\ContactFormSubmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\ContactFormRequest;
+use App\Models\ContactMessage;
+use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
@@ -14,19 +17,33 @@ class ContactController extends Controller
         return view('frontend.contact');
     }
 
-    public function store(Request $request)
+    public function store(ContactFormRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'message' => 'required|string',
-            'subject' => 'required|string|max:255',
-        ]);
+        try {
+            // Store the contact message
+            $contactMessage = ContactMessage::create($request->validated());
 
-        // Send email
-        Mail::to('info@newhorizon.com')->send(new ContactFormSubmission($validated));
+            // Send email notification
+            Mail::to(config('mail.contact.address', 'info@newhorizon.com'))
+                ->send(new ContactFormSubmission($contactMessage));
 
-        return back()->with('success', 'Thank you for your message. We will be in touch shortly.');
+            // Log successful submission
+            Log::info('Contact form submitted', [
+                'contact_id' => $contactMessage->id,
+                'email' => $contactMessage->email
+            ]);
+
+            return back()->with('success', 'Thank you for your message. We will be in touch shortly.');
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Contact form submission failed', [
+                'error' => $e->getMessage(),
+                'data' => $request->except('_token')
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Sorry, there was a problem sending your message. Please try again later.');
+        }
     }
 }

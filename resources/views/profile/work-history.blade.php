@@ -14,9 +14,9 @@
                         </button>
                     </div>
 
-                    @if($workHistories->count() > 0)
+                    @if($workHistory->count() > 0)
                         <div class="space-y-6">
-                            @foreach($workHistories as $history)
+                            @foreach($workHistory as $history)
                                 <div class="p-6 bg-white border rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600">
                                     <div class="flex items-center justify-between mb-4">
                                         <div>
@@ -67,7 +67,7 @@
                                             </div>
                                             <form action="{{ route('profile.work-history.update', $history->id) }}" method="POST">
                                                 @csrf
-                                                @method('PUT')
+                                                @method('PATCH')
                                                 <div class="space-y-4">
                                                     <div>
                                                         <label for="company_name_{{ $history->id }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Name</label>
@@ -111,7 +111,7 @@
                                 </div>
                             @endforeach
                         </div>
-                        {{ $workHistories->links() }}
+                        {{ $workHistory->links() }}
                     @else
                         <div class="p-4 text-center bg-gray-100 rounded-lg dark:bg-gray-700">
                             <p class="text-gray-600 dark:text-gray-400">No work history records found.</p>
