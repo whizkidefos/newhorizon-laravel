@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Admin\UserRequest;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use PDF;
 
 class UserController extends Controller
 {
@@ -60,7 +61,11 @@ class UserController extends Controller
             'references',
             'shifts' => function($query) {
                 $query->latest()->take(5);
-            }
+            },
+            'profileDetail',
+            'bankDetail',
+            'workHistory',
+            'trainingRecords'
         ]);
 
         return view('admin.users.show', compact('user'));
@@ -118,5 +123,63 @@ class UserController extends Controller
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'User deleted successfully');
+    }
+
+    public function export(Request $request, User $user)
+    {
+        $request->validate([
+            'sections' => 'required|array',
+            'sections.*' => 'required|string|in:personal,documents,address,bank,work,training',
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date|after_or_equal:date_from'
+        ]);
+
+        // Load necessary relationships based on selected sections
+        $relations = ['documents', 'certifications'];
+        if (in_array('address', $request->sections)) {
+            $relations[] = 'profileDetail';
+        }
+        if (in_array('bank', $request->sections)) {
+            $relations[] = 'bankDetail';
+        }
+        if (in_array('work', $request->sections)) {
+            $relations[] = 'workHistory';
+        }
+        if (in_array('training', $request->sections)) {
+            $relations[] = 'trainingRecords';
+        }
+
+        $user->load($relations);
+
+        // Filter data by date range if provided
+        if ($request->date_from || $request->date_to) {
+            $dateFrom = $request->date_from ? \Carbon\Carbon::parse($request->date_from) : null;
+            $dateTo = $request->date_to ? \Carbon\Carbon::parse($request->date_to) : now();
+
+            if (in_array('work', $request->sections)) {
+                $user->workHistory = $user->workHistory->filter(function($work) use ($dateFrom, $dateTo) {
+                    return (!$dateFrom || $work->start_date >= $dateFrom) &&
+                           (!$dateTo || $work->start_date <= $dateTo);
+                });
+            }
+
+            if (in_array('training', $request->sections)) {
+                $user->trainingRecords = $user->trainingRecords->filter(function($training) use ($dateFrom, $dateTo) {
+                    return (!$dateFrom || $training->completion_date >= $dateFrom) &&
+                           (!$dateTo || $training->completion_date <= $dateTo);
+                });
+            }
+        }
+
+        // Generate PDF
+        $pdf = PDF::loadView('admin.users.pdf.profile', [
+            'user' => $user,
+            'sections' => $request->sections
+        ]);
+
+        // Create filename using user's name
+        $filename = 'employee-profile-' . strtolower(str_replace(' ', '-', $user->full_name)) . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

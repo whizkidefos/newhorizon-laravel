@@ -143,6 +143,7 @@ Route::prefix('admin')
         Route::resource('users', Admin\UserController::class);
         Route::post('users/{user}/verify-documents', [Admin\UserController::class, 'verifyDocuments'])
             ->name('users.verify-documents');
+        Route::post('/users/{user}/export', [Admin\UserController::class, 'export'])->name('users.export');
         
         // Shift Management
         Route::resource('shifts', Admin\ShiftController::class);

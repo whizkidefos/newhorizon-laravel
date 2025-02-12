@@ -9,7 +9,7 @@
                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                     Edit User
                 </a>
-                <button onclick="exportUserProfile()" 
+                <button onclick="openExportModal()" 
                         class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
                     Export Profile
                 </button>
@@ -17,7 +17,7 @@
         </div>
     </x-slot>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
         <!-- Personal Information -->
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Personal Information</h3>
@@ -170,7 +170,7 @@
     </div>
 
     <!-- Recent Shifts -->
-    <div class="mt-6">
+    <div class="mt-6 p-6">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-4 py-5 sm:px-6">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">Recent Shifts</h3>
@@ -206,7 +206,7 @@
     </div>
 
     <!-- Additional Details -->
-    <div class="mt-6">
+    <div class="mt-6 p-6">
         <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
             <div class="px-4 py-5 sm:px-6">
                 <h3 class="text-lg font-medium text-gray-900 dark:text-white">Additional Details</h3>
@@ -316,4 +316,146 @@
             </div>
         </div>
     </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    Export Profile Configuration
+                </h3>
+                <form id="exportForm" action="{{ route('admin.users.export', $user) }}" method="POST">
+                    @csrf
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                                Sections to Include
+                            </label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="sections[]" value="personal" class="rounded border-gray-300" checked>
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Personal Information</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="sections[]" value="documents" class="rounded border-gray-300" checked>
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Documents & Certifications</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="sections[]" value="address" class="rounded border-gray-300" checked>
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Address Information</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="sections[]" value="bank" class="rounded border-gray-300">
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Bank Details</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="sections[]" value="work" class="rounded border-gray-300" checked>
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Work History</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="sections[]" value="training" class="rounded border-gray-300" checked>
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Training Records</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                                Date Range
+                            </label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm text-gray-600 dark:text-gray-400">From</label>
+                                    <input type="date" name="date_from" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-600 dark:text-gray-400">To</label>
+                                    <input type="date" name="date_to" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end space-x-4">
+                        <button type="button" onclick="closeExportModal()" 
+                                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                            Download PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        function openExportModal() {
+            document.getElementById('exportModal').classList.remove('hidden');
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('exportModal');
+            const modalContent = modal.querySelector('.relative');
+            if (event.target === modal) {
+                closeExportModal();
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('exportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const formData = new FormData(form);
+            
+            // Show loading state
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerText;
+            submitButton.disabled = true;
+            submitButton.innerText = 'Generating...';
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Export failed');
+                return response.blob();
+            })
+            .then(blob => {
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `user-profile-${new Date().getTime()}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                // Close modal
+                closeExportModal();
+            })
+            .catch(error => {
+                console.error('Export error:', error);
+                alert('Failed to generate export. Please try again.');
+            })
+            .finally(() => {
+                // Reset button state
+                submitButton.disabled = false;
+                submitButton.innerText = originalText;
+            });
+        });
+    </script>
+    @endpush
 </x-admin-layout>
