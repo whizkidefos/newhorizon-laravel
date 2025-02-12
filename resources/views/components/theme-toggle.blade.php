@@ -1,15 +1,27 @@
-<div x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }"
-     x-init="$watch('darkMode', value => {
-         localStorage.setItem('darkMode', value)
-         if (value) {
-             document.documentElement.classList.add('dark')
-         } else {
-             document.documentElement.classList.remove('dark')
-         }
-     })"
-     class="flex items-center">
+<div x-data="{ 
+    darkMode: localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
+}"
+    x-init="
+        if (darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        $watch('darkMode', value => {
+            localStorage.setItem('darkMode', value);
+            if (value) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    "
+    class="flex items-center">
     <button @click="darkMode = !darkMode"
-            class="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+            type="button"
+            class="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+            :aria-label="darkMode ? 'Switch to light mode' : 'Switch to dark mode'">
         <template x-if="darkMode">
             <!-- Sun icon -->
             <svg class="h-6 w-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

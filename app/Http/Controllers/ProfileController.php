@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UpdateProfileRequest;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
@@ -30,43 +31,71 @@ class ProfileController extends Controller
 
     public function update(UpdateProfileRequest $request)
     {
-        $user = auth()->user();
-        $validated = $request->validated();
+        try {
+            $user = auth()->user();
+            $validated = $request->validated();
 
-        if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo) {
-                Storage::disk('public')->delete($user->profile_photo);
+            Log::info('Profile update validated data:', $validated);
+
+            // Handle file uploads
+            if ($request->hasFile('profile_photo')) {
+                if ($user->profile_photo) {
+                    Storage::disk('public')->delete($user->profile_photo);
+                }
+                $validated['profile_photo'] = $request->file('profile_photo')
+                    ->store('profile-photos', 'public');
             }
-            $validated['profile_photo'] = $request->file('profile_photo')
-                ->store('profile-photos', 'public');
-        }
 
-        if ($request->hasFile('signature')) {
-            if ($user->signature) {
-                Storage::disk('public')->delete($user->signature);
+            if ($request->hasFile('signature')) {
+                if ($user->signature) {
+                    Storage::disk('public')->delete($user->signature);
+                }
+                $validated['signature'] = $request->file('signature')
+                    ->store('signatures', 'public');
+                $validated['signature_date'] = now();
             }
-            $validated['signature'] = $request->file('signature')
-                ->store('signatures', 'public');
-            $validated['signature_date'] = now();
+
+            if ($request->hasFile('dbs_certificate')) {
+                if ($user->dbs_certificate) {
+                    Storage::disk('public')->delete($user->dbs_certificate);
+                }
+                $validated['dbs_certificate'] = $request->file('dbs_certificate')
+                    ->store('dbs-certificates', 'public');
+            }
+
+            if ($request->hasFile('brp_document')) {
+                if ($user->brp_document) {
+                    Storage::disk('public')->delete($user->brp_document);
+                }
+                $validated['brp_document'] = $request->file('brp_document')
+                    ->store('brp-documents', 'public');
+            }
+
+            // Handle boolean fields
+            $validated['has_enhanced_dbs'] = $request->boolean('has_enhanced_dbs');
+            $validated['right_to_work_uk'] = $request->boolean('right_to_work_uk');
+            $validated['has_criminal_convictions'] = $request->boolean('has_criminal_convictions');
+
+            // Update user profile
+            $user->update($validated);
+
+            Log::info('Profile updated successfully for user:', ['id' => $user->id]);
+
+            // Flash success message
+            return redirect()->route('profile.edit')
+                ->with('status', 'profile-updated')
+                ->with('message', 'Your profile has been updated successfully.');
+
+        } catch (\Exception $e) {
+            Log::error('Profile update failed:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to update profile. Please try again.']);
         }
-
-        $user->update($validated);
-
-        if ($request->has('address_line_1')) {
-            $user->profileDetails()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'address_line_1' => $request->address_line_1,
-                    'address_line_2' => $request->address_line_2,
-                    'city' => $request->city,
-                    'postcode' => $request->postcode,
-                    'country' => $request->country,
-                ]
-            );
-        }
-
-        return redirect()->route('profile.index')
-            ->with('success', 'Profile updated successfully');
     }
 
     public function updatePassword(Request $request)

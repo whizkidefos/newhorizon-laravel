@@ -89,4 +89,15 @@ class ShiftController extends Controller
         
         return Excel::download(new TimesheetExport(auth()->user()), $filename);
     }
+
+    /**
+     * Display a listing of the authenticated user's shifts.
+     */
+    public function myShifts()
+    {
+        $user = auth()->user();
+        $shifts = $user->shifts()->with(['facility'])->latest()->paginate(10);
+
+        return view('shifts.my-shifts', compact('shifts'));
+    }
 }

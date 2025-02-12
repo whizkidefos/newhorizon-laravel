@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\{
     ResetPasswordController
 };
 use App\Http\Controllers\FaviconController;
+use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BankDetailsController;
 use App\Http\Controllers\WorkHistoryController;
@@ -38,6 +39,11 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 // Legal Pages
 Route::view('/terms', 'legal.terms')->name('terms');
 Route::view('/privacy', 'legal.privacy')->name('privacy');
+
+// Policy Pages
+Route::get('/privacy-policy', [PolicyController::class, 'privacy'])->name('policy.privacy');
+Route::get('/terms-and-conditions', [PolicyController::class, 'terms'])->name('policy.terms');
+Route::get('/cookie-policy', [PolicyController::class, 'cookies'])->name('policy.cookies');
 
 // Favicon
 Route::get('/favicon.svg', [FaviconController::class, 'svg']);
