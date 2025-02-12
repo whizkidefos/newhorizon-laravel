@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\CustomVerifyEmail;
-
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -38,7 +38,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'has_criminal_convictions',
         'password',
         'signature',
-        'signature_date'
+        'signature_date',
+        'is_admin',
+        'admin_level',
+        'admin_created_at',
+        'created_by_admin_id'
     ];
 
     protected $hidden = [
@@ -50,10 +54,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'phone_verified_at' => 'datetime',
         'date_of_birth' => 'date',
+        'signature_date' => 'datetime',
+        'admin_created_at' => 'datetime',
+        'is_admin' => 'boolean',
         'has_enhanced_dbs' => 'boolean',
         'right_to_work_uk' => 'boolean',
-        'has_criminal_convictions' => 'boolean',
-        'signature_date' => 'datetime',
+        'has_criminal_convictions' => 'boolean'
     ];
 
     public function shifts(): HasMany
@@ -108,6 +114,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Lesson::class, 'lesson_user')
             ->withTimestamps()
             ->withPivot('completed_at');
+    }
+
+    public function activities(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'causer');
     }
 
     public function getFullNameAttribute()

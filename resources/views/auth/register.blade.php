@@ -1,5 +1,7 @@
 @extends('layouts.auth')
 
+@section('title', 'Register')
+
 @section('auth-content')
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto">
@@ -211,7 +213,9 @@
                     </a>
 
                     <x-primary-button class="ml-4">
-                        {{ __('Log In') }}
+                        <a href="{{ route('login') }}">
+                            {{ __('Log In') }}
+                        </a>
                     </x-primary-button>
                 </div>
             </form>

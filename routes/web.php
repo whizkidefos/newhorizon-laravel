@@ -23,6 +23,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\JobController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +36,11 @@ Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/services', [ServiceController::class, 'index'])->name('services');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+// Jobs
+Route::get('/jobs', [JobController::class, 'index'])->name('jobs.index');
+Route::get('/jobs/search', [JobController::class, 'search'])->name('jobs.search');
+Route::get('/jobs/{job}', [JobController::class, 'show'])->name('jobs.show');
 
 // Legal Pages
 Route::view('/terms', 'legal.terms')->name('terms');

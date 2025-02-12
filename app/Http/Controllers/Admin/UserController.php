@@ -8,19 +8,20 @@ use App\Models\Document;
 use Illuminate\Http\Request;
 use App\Http\Requests\Admin\UserRequest;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::query()
+        $query = User::query()
             ->where('is_admin', false)
             ->when($request->search, function($query, $search) {
                 $query->where(function($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
                       ->orWhere('last_name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('mobile_phone', 'like', "%{$search}%");
+                      ->orWhere('mobile_number', 'like', "%{$search}%");
                 });
             })
             ->when($request->job_role, function($query, $role) {
@@ -32,10 +33,21 @@ class UserController extends Controller
                 } else {
                     $query->whereNull('email_verified_at');
                 }
-            })
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+            });
+
+        // Debug: Log the SQL query
+        Log::info('Users Query:', [
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings()
+        ]);
+
+        $users = $query->latest()->paginate(10)->withQueryString();
+
+        // Debug: Log the number of users found
+        Log::info('Users Count:', [
+            'count' => $users->count(),
+            'total' => $users->total()
+        ]);
 
         return view('admin.users.index', compact('users'));
     }

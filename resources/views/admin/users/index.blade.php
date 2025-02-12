@@ -34,14 +34,17 @@
                                         id="job_role"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                                     <option value="">All Roles</option>
-                                    <option value="registered_nurse" {{ request('job_role') == 'registered_nurse' ? 'selected' : '' }}>
+                                    <option value="Registered Nurse" {{ request('job_role') == 'Registered Nurse' ? 'selected' : '' }}>
                                         Registered Nurse
                                     </option>
-                                    <option value="healthcare_assistant" {{ request('job_role') == 'healthcare_assistant' ? 'selected' : '' }}>
+                                    <option value="Healthcare Assistant" {{ request('job_role') == 'Healthcare Assistant' ? 'selected' : '' }}>
                                         Healthcare Assistant
                                     </option>
-                                    <option value="support_worker" {{ request('job_role') == 'support_worker' ? 'selected' : '' }}>
+                                    <option value="Support Worker" {{ request('job_role') == 'Support Worker' ? 'selected' : '' }}>
                                         Support Worker
+                                    </option>
+                                    <option value="Senior Care Assistant" {{ request('job_role') == 'Senior Care Assistant' ? 'selected' : '' }}>
+                                        Senior Care Assistant
                                     </option>
                                 </select>
                             </div>
@@ -77,28 +80,84 @@
 
     <!-- Users List -->
     <x-container>
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden mb-8">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                        <!-- Table headers... -->
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Name
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Contact
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Role
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Actions
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @foreach($users as $user)
+                    @forelse($users as $user)
                         <tr>
-                            <!-- User data... -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    @if($user->profile_photo)
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <img class="h-10 w-10 rounded-full" src="{{ asset('storage/' . $user->profile_photo) }}" alt="">
+                                        </div>
+                                    @endif
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {{ $user->first_name }} {{ $user->last_name }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $user->username }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-gray-100">{{ $user->email }}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $user->mobile_number }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    {{ $user->job_role }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($user->email_verified_at)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Verified
+                                    </span>
+                                @else
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Unverified
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="{{ route('admin.users.show', $user) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">View</a>
+                            </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 text-center">
+                                No users found
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
-        </div>
-    </x-container>
 
-    <!-- Pagination -->
-    <x-container>
-        <div class="mt-4">
-            {{ $users->links() }}
+            <div class="p-4">
+                {{ $users->links() }}
+            </div>
         </div>
     </x-container>
 </x-admin-layout>

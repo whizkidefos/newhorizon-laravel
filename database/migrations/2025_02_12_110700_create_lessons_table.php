@@ -13,8 +13,7 @@ return new class extends Migration
             $table->foreignId('module_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->text('content')->nullable();
-            $table->integer('duration')->default(0); // in minutes
+            $table->integer('duration')->default(0)->comment('Duration in minutes');
             $table->integer('order')->default(0);
             $table->timestamps();
         });

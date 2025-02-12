@@ -10,32 +10,61 @@ class RoleSeeder extends Seeder
 {
     public function run()
     {
-        // Create roles
         $roles = [
-            'admin' => [
-                'manage users',
-                'manage roles',
-                'manage courses',
-                'manage shifts',
-                'view reports'
-            ],
-            'employee' => [
-                'view profile',
-                'edit profile',
-                'view courses',
-                'enroll courses',
-                'view shifts',
-                'book shifts'
-            ],
+            'super-admin',
+            'admin',
+            'healthcare_worker',
+            'employer',
+            'trainer'
         ];
 
-        foreach ($roles as $role => $permissions) {
-            $roleModel = Role::create(['name' => $role]);
-
-            foreach ($permissions as $permission) {
-                $permissionModel = Permission::firstOrCreate(['name' => $permission]);
-                $roleModel->givePermissionTo($permissionModel);
-            }
+        foreach ($roles as $role) {
+            Role::firstOrCreate(['name' => $role]);
         }
+
+        // Create permissions
+        $permissions = [
+            'manage_users',
+            'manage_roles',
+            'manage_shifts',
+            'manage_courses',
+            'view_reports',
+            'manage_settings',
+            'manage_trainings',
+            'manage_certifications',
+            'manage_documents'
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // Assign all permissions to super-admin and admin roles
+        $superAdminRole = Role::findByName('super-admin');
+        $adminRole = Role::findByName('admin');
+        
+        $superAdminRole->syncPermissions($permissions);
+        $adminRole->syncPermissions($permissions);
+
+        // Assign specific permissions to other roles
+        $healthcareWorkerRole = Role::findByName('healthcare_worker');
+        $healthcareWorkerRole->syncPermissions([
+            'view_reports',
+            'manage_documents'
+        ]);
+
+        $employerRole = Role::findByName('employer');
+        $employerRole->syncPermissions([
+            'manage_shifts',
+            'view_reports',
+            'manage_documents'
+        ]);
+
+        $trainerRole = Role::findByName('trainer');
+        $trainerRole->syncPermissions([
+            'manage_trainings',
+            'manage_certifications',
+            'view_reports'
+        ]);
     }
 }

@@ -21,22 +21,10 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->timestamps();
         });
-
-        // Pivot table for user courses
-        Schema::create('course_user', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
-            $table->string('status')->default('enrolled');
-            $table->string('payment_status')->default('pending');
-            $table->integer('progress')->default(0);
-            $table->timestamps();
-        });
     }
 
     public function down()
     {
-        Schema::dropIfExists('course_user');
         Schema::dropIfExists('courses');
     }
 };

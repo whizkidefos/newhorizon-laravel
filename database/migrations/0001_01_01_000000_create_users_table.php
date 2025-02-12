@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('mobile_number')->unique();
             $table->string('username')->unique();
-            $table->enum('job_role', ['Registered Nurse', 'Healthcare Assistant', 'Support Worker']);
+            $table->enum('job_role', ['Registered Nurse', 'Healthcare Assistant', 'Support Worker', 'Senior Care Assistant']);
             $table->string('password');
             $table->string('profile_photo')->nullable();
             $table->date('date_of_birth');

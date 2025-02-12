@@ -18,6 +18,7 @@ return new class extends Migration
             $table->nullableMorphs('subject');
             $table->nullableMorphs('causer');
             $table->json('properties')->nullable();
+            $table->foreignId('shift_id')->nullable()->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

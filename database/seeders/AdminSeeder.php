@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Role;
 
 class AdminSeeder extends Seeder
 {
-   public function run()
+    public function run()
     {
         // Create roles if they don't exist
         $roles = ['super-admin', 'admin', 'healthcare-professional'];
@@ -37,6 +37,7 @@ class AdminSeeder extends Seeder
                 'right_to_work_uk' => true,
                 'has_enhanced_dbs' => true,
                 'email_verified_at' => now(),
+                'is_admin' => true,
             ]);
 
             // Create profile details
@@ -47,9 +48,9 @@ class AdminSeeder extends Seeder
                 'postcode' => 'CH1 1AA',
                 'country' => 'UK',
             ]);
-        }
 
-        // Make sure the user has the super-admin role
-        $superAdmin->syncRoles(['super-admin']);
+            // Assign admin role
+            $superAdmin->assignRole('admin');
+        }
     }
 }

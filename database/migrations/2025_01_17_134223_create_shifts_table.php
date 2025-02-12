@@ -14,7 +14,8 @@ return new class extends Migration
             $table->dateTime('start_datetime');
             $table->dateTime('end_datetime');
             $table->string('location');
-            $table->enum('status', ['open', 'assigned', 'checked_in', 'completed', 'cancelled']);
+            $table->string('department');
+            $table->enum('status', ['scheduled', 'in_progress', 'completed', 'cancelled']);
             $table->dateTime('checkin_time')->nullable();
             $table->dateTime('checkout_time')->nullable();
             $table->json('last_tracked_location')->nullable();

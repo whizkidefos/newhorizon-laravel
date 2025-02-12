@@ -11,19 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('work_history', function (Blueprint $table) {
+        Schema::create('work_histories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('employer_name');
+            $table->string('company_name');
             $table->string('position');
             $table->date('start_date');
             $table->date('end_date')->nullable();
-            $table->text('responsibilities');
-            $table->string('reference_name');
-            $table->string('reference_email');
-            $table->string('reference_phone');
-            $table->timestamps();
+            $table->text('description')->nullable();
+            $table->string('reference_name')->nullable();
+            $table->string('reference_contact')->nullable();
             $table->softDeletes();
+            $table->timestamps();
         });
     }
 
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('work_history');
+        Schema::dropIfExists('work_histories');
     }
 };

@@ -16,8 +16,22 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Scripts -->
+    <script defer src="https://unpkg.com/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <style>
+        @keyframes text-slide {
+            0% { transform: translateY(0); }
+            20% { transform: translateY(-1.25em); }
+            40% { transform: translateY(-2.5em); }
+            60% { transform: translateY(-3.75em); }
+            80% { transform: translateY(-5em); }
+        }
+        .animate-text-slide {
+            animation: text-slide 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+    </style>
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
