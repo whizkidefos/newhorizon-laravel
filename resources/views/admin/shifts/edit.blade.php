@@ -14,7 +14,7 @@
         </div>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto p-8">
         <!-- Edit Form -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
             <form action="{{ route('admin.shifts.update', $shift) }}" method="POST" class="p-6">
