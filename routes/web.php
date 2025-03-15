@@ -139,12 +139,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 | Admin Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
     
-    // Admin Management (Super Admin Only) - Commented out until AdminController is created
-    Route::middleware(['super_admin'])->group(function () {
+    // Admin Management (Super Admin Only)
+    Route::middleware([\App\Http\Middleware\SuperAdminMiddleware::class])->group(function () {
         Route::resource('admins', Admin\AdminController::class);
     });
     
