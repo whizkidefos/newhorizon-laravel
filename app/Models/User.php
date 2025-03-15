@@ -42,7 +42,15 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_admin',
         'admin_level',
         'admin_created_at',
-        'created_by_admin_id'
+        'created_by_admin_id',
+        'address_line_1',
+        'address_line_2',
+        'city',
+        'county',
+        'postcode',
+        'employee_id',
+        'department',
+        'position',
     ];
 
     protected $hidden = [
@@ -52,14 +60,14 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'phone_verified_at' => 'datetime',
+        'password' => 'hashed',
         'date_of_birth' => 'date',
-        'signature_date' => 'datetime',
+        'signature_date' => 'date',
         'admin_created_at' => 'datetime',
         'is_admin' => 'boolean',
         'has_enhanced_dbs' => 'boolean',
         'right_to_work_uk' => 'boolean',
-        'has_criminal_convictions' => 'boolean'
+        'has_criminal_convictions' => 'boolean',
     ];
 
     public function shifts(): HasMany
@@ -129,5 +137,29 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new CustomVerifyEmail);
+    }
+
+    /**
+     * Get the timesheets for the user.
+     */
+    public function timesheets()
+    {
+        return $this->hasMany(Timesheet::class);
+    }
+
+    /**
+     * Get the complaints submitted by the user.
+     */
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
+    /**
+     * Get the complaints resolved by the user.
+     */
+    public function resolvedComplaints()
+    {
+        return $this->hasMany(Complaint::class, 'resolved_by');
     }
 }

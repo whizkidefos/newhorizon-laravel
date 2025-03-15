@@ -45,6 +45,42 @@
                     </div>
                 </div>
 
+                <!-- Timesheet Stats Card -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Timesheets</div>
+                                <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $totalTimesheets }}</div>
+                                <div class="text-sm text-yellow-600">{{ $pendingTimesheets }} pending approval</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complaint Stats Card -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-red-500 rounded-md p-3">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Complaints</div>
+                                <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $totalComplaints }}</div>
+                                <div class="text-sm text-red-600">{{ $openComplaints + $inProgressComplaints }} need attention</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Verification Stats Card -->
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg">
                     <div class="p-6">
@@ -240,6 +276,89 @@
                             No recent activities
                         </div>
                         @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timesheet and Complaint Status -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                <!-- Pending Timesheets -->
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Pending Timesheets</h3>
+                        <a href="{{ route('admin.timesheets.index') }}" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">View All</a>
+                    </div>
+                    <div class="p-6">
+                        @if($pendingTimesheets > 0)
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Total Pending</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $pendingTimesheets }}</div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Approved</div>
+                                    <div class="text-sm font-medium text-green-600">{{ $approvedTimesheets }}</div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Rejected</div>
+                                    <div class="text-sm font-medium text-red-600">{{ $rejectedTimesheets }}</div>
+                                </div>
+                                <div class="mt-4">
+                                    <a href="{{ route('admin.timesheets.export') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Export Timesheets
+                                    </a>
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <p class="text-gray-500 dark:text-gray-400">No pending timesheets</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Open Complaints -->
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Complaints Status</h3>
+                        <a href="{{ route('admin.complaints.index') }}" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">View All</a>
+                    </div>
+                    <div class="p-6">
+                        @if($totalComplaints > 0)
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Open</div>
+                                    <div class="text-sm font-medium text-red-600">{{ $openComplaints }}</div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">In Progress</div>
+                                    <div class="text-sm font-medium text-yellow-600">{{ $inProgressComplaints }}</div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Resolved</div>
+                                    <div class="text-sm font-medium text-green-600">{{ $resolvedComplaints }}</div>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <div class="text-sm text-gray-600 dark:text-gray-400">Closed</div>
+                                    <div class="text-sm font-medium text-gray-600">{{ $closedComplaints }}</div>
+                                </div>
+                                <div class="mt-4">
+                                    <a href="{{ route('admin.complaints.export') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Export Complaints
+                                    </a>
+                                </div>
+                            </div>
+                        @else
+                            <div class="text-center py-4">
+                                <p class="text-gray-500 dark:text-gray-400">No complaints recorded</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -11,6 +11,13 @@
     <meta name="description" content="@yield('meta_description', 'Leading healthcare staffing solutions in North Wales and North West England')">
     <meta name="keywords" content="@yield('meta_keywords', 'healthcare staffing, nurses, care assistants, North Wales, North West England')">
 
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url('favicon.svg') }}" type="image/svg+xml">
+    <link rel="alternate icon" href="{{ url('favicon.ico') }}" type="image/x-icon">
+    <link rel="mask-icon" href="{{ url('favicon.svg') }}" color="#F59E0B">
+    <meta name="theme-color" content="#F59E0B" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#FBBF24" media="(prefers-color-scheme: dark)">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -44,6 +51,27 @@
                     {{ $header }}
                 </div>
             </header>
+        @endif
+
+        <!-- Toast Notifications -->
+        @if (session('success'))
+            <x-toast type="success" :message="session('success')" />
+        @endif
+
+        @if (session('error'))
+            <x-toast type="error" :message="session('error')" />
+        @endif
+
+        @if (session('warning'))
+            <x-toast type="warning" :message="session('warning')" />
+        @endif
+
+        @if (session('info'))
+            <x-toast type="info" :message="session('info')" />
+        @endif
+
+        @if (session('status') === 'profile-updated')
+            <x-toast type="success" message="Profile updated successfully." />
         @endif
 
         <!-- Page Content -->

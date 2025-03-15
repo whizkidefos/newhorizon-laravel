@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Shift;
 use App\Models\Activity;
 use App\Models\Document;
+use App\Models\Timesheet;
+use App\Models\Complaint;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +36,19 @@ class DashboardController extends Controller
         $upcomingShifts = Shift::where('start_time', '>', now())
             ->where('start_time', '<', now()->addDays(7))
             ->count();
+        
+        // Timesheet statistics
+        $totalTimesheets = Timesheet::count();
+        $pendingTimesheets = Timesheet::where('status', 'pending')->count();
+        $approvedTimesheets = Timesheet::where('status', 'approved')->count();
+        $rejectedTimesheets = Timesheet::where('status', 'rejected')->count();
+        
+        // Complaint statistics
+        $totalComplaints = Complaint::count();
+        $openComplaints = Complaint::where('status', 'open')->count();
+        $inProgressComplaints = Complaint::where('status', 'in_progress')->count();
+        $resolvedComplaints = Complaint::where('status', 'resolved')->count();
+        $closedComplaints = Complaint::where('status', 'closed')->count();
         
         // Monthly user registration trend
         $userTrend = User::where('is_admin', false)
@@ -79,6 +94,15 @@ class DashboardController extends Controller
             'pendingDocuments',
             'verifiedDocuments',
             'upcomingShifts',
+            'totalTimesheets',
+            'pendingTimesheets',
+            'approvedTimesheets',
+            'rejectedTimesheets',
+            'totalComplaints',
+            'openComplaints',
+            'inProgressComplaints',
+            'resolvedComplaints',
+            'closedComplaints',
             'userTrend',
             'documentTypes',
             'recentActivities',

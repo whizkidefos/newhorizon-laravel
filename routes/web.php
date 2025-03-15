@@ -24,6 +24,8 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\TimesheetController;
+use App\Http\Controllers\ComplaintController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -111,6 +113,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/my-shifts', [ShiftController::class, 'myShifts'])->name('shifts.my');
     Route::post('/shifts/{shift}/check-in', [ShiftController::class, 'checkIn'])->name('shifts.check-in');
     Route::post('/shifts/{shift}/check-out', [ShiftController::class, 'checkOut'])->name('shifts.check-out');
+    Route::get('/shifts/{shift}/checkout-options', [ShiftController::class, 'checkoutOptions'])->name('shifts.checkout-options');
+    Route::post('/shifts/{shift}/quick-timesheet', [ShiftController::class, 'quickSubmitTimesheet'])->name('shifts.quick-timesheet');
+    
+    // Timesheet routes
+    Route::resource('timesheets', TimesheetController::class);
+    Route::get('/shifts/{shift}/timesheet/create', [TimesheetController::class, 'createFromShift'])->name('timesheets.create-from-shift');
+    
+    // Complaint routes
+    Route::resource('complaints', ComplaintController::class);
+    Route::get('/shifts/{shift}/complaint/create', [ComplaintController::class, 'createFromShift'])->name('complaints.create-from-shift');
     
     // Training & Courses
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
@@ -127,43 +139,56 @@ Route::middleware(['auth', 'verified'])->group(function () {
 | Admin Routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')
-    ->middleware(['auth', \App\Http\Middleware\AdminMiddleware::class])
-    ->name('admin.')
-    ->group(function () {
-        // Dashboard
-        Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
-        
-        // Admin Management (Super Admin Only)
-        Route::middleware(['super_admin'])->group(function () {
-            Route::resource('admins', Admin\AdminController::class);
-        });
-        
-        // User Management
-        Route::resource('users', Admin\UserController::class);
-        Route::post('users/{user}/verify-documents', [Admin\UserController::class, 'verifyDocuments'])
-            ->name('users.verify-documents');
-        Route::post('/users/{user}/export', [Admin\UserController::class, 'export'])->name('users.export');
-        
-        // Shift Management
-        Route::resource('shifts', Admin\ShiftController::class);
-        Route::post('shifts/{shift}/assign', [Admin\ShiftController::class, 'assign'])->name('shifts.assign');
-        Route::get('shifts/{shift}/track', [Admin\ShiftController::class, 'track'])->name('shifts.track');
-        
-        // Course Management
-        Route::resource('courses', Admin\CourseController::class);
-        Route::get('courses/{course}/enrollments', [Admin\CourseController::class, 'enrollments'])
-            ->name('courses.enrollments');
-        
-        // Reports
-        Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('/shifts', [Admin\ReportController::class, 'shifts'])->name('shifts');
-            Route::get('/users', [Admin\ReportController::class, 'users'])->name('users');
-            Route::get('/courses', [Admin\ReportController::class, 'courses'])->name('courses');
-            Route::get('/export/{type}', [Admin\ReportController::class, 'export'])->name('export');
-        });
-        
-        // Settings
-        Route::get('/settings', [Admin\SettingController::class, 'edit'])->name('settings.edit');
-        Route::put('/settings', [Admin\SettingController::class, 'update'])->name('settings.update');
+Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Admin Management (Super Admin Only) - Commented out until AdminController is created
+    Route::middleware(['super_admin'])->group(function () {
+        Route::resource('admins', Admin\AdminController::class);
     });
+    
+    // User Management
+    Route::resource('users', Admin\UserController::class);
+    Route::post('users/{user}/verify-documents', [Admin\UserController::class, 'verifyDocuments'])
+        ->name('users.verify-documents');
+    Route::post('/users/{user}/export', [Admin\UserController::class, 'export'])->name('users.export');
+    
+    // Shift Management
+    Route::resource('shifts', Admin\ShiftController::class);
+    Route::get('/shifts/{shift}/assign', [Admin\ShiftController::class, 'showAssignForm'])->name('shifts.assign');
+    Route::post('/shifts/{shift}/assign', [Admin\ShiftController::class, 'assignUser'])->name('shifts.assign.store');
+    Route::get('shifts/{shift}/track', [Admin\ShiftController::class, 'track'])->name('shifts.track');
+    
+    // Course Management
+    Route::resource('courses', Admin\CourseController::class);
+    Route::get('courses/{course}/enrollments', [Admin\CourseController::class, 'enrollments'])
+        ->name('courses.enrollments');
+    
+    // Timesheet Management
+    Route::resource('timesheets', Admin\TimesheetController::class);
+    Route::post('timesheets/{timesheet}/approve', [Admin\TimesheetController::class, 'approve'])->name('timesheets.approve');
+    Route::post('timesheets/{timesheet}/reject', [Admin\TimesheetController::class, 'reject'])->name('timesheets.reject');
+    Route::get('/timesheets-export', [Admin\TimesheetExportController::class, 'index'])->name('timesheets.export');
+    Route::post('/timesheets-export/download', [Admin\TimesheetExportController::class, 'export'])->name('timesheets.export.download');
+    
+    // Complaint Management
+    Route::resource('complaints', Admin\ComplaintController::class);
+    Route::post('/complaints/{complaint}/in-progress', [Admin\ComplaintController::class, 'markInProgress'])->name('complaints.in-progress');
+    Route::post('/complaints/{complaint}/resolve', [Admin\ComplaintController::class, 'resolve'])->name('complaints.resolve');
+    Route::post('/complaints/{complaint}/close', [Admin\ComplaintController::class, 'close'])->name('complaints.close');
+    Route::get('/complaints-export', [Admin\ComplaintExportController::class, 'index'])->name('complaints.export');
+    Route::post('/complaints-export/download', [Admin\ComplaintExportController::class, 'export'])->name('complaints.export.download');
+    
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/shifts', [Admin\ReportController::class, 'shifts'])->name('shifts');
+        Route::get('/users', [Admin\ReportController::class, 'users'])->name('users');
+        Route::get('/courses', [Admin\ReportController::class, 'courses'])->name('courses');
+        Route::get('/export/{type}', [Admin\ReportController::class, 'export'])->name('export');
+    });
+    
+    // Settings
+    Route::get('/settings', [Admin\SettingController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [Admin\SettingController::class, 'update'])->name('settings.update');
+});

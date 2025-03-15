@@ -120,6 +120,74 @@
                             </div>
                         </div>
 
+                        <!-- Address Information -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Address Information</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Address Line 1 -->
+                                <div class="md:col-span-2">
+                                    <x-input-label for="address_line_1" :value="__('Address Line 1')" />
+                                    <x-text-input id="address_line_1" name="address_line_1" type="text" class="mt-1 block w-full" :value="old('address_line_1', $user->address_line_1)" />
+                                    <x-input-error :messages="$errors->get('address_line_1')" class="mt-2" />
+                                </div>
+
+                                <!-- Address Line 2 -->
+                                <div class="md:col-span-2">
+                                    <x-input-label for="address_line_2" :value="__('Address Line 2')" />
+                                    <x-text-input id="address_line_2" name="address_line_2" type="text" class="mt-1 block w-full" :value="old('address_line_2', $user->address_line_2)" />
+                                    <x-input-error :messages="$errors->get('address_line_2')" class="mt-2" />
+                                </div>
+
+                                <!-- City -->
+                                <div>
+                                    <x-input-label for="city" :value="__('City')" />
+                                    <x-text-input id="city" name="city" type="text" class="mt-1 block w-full" :value="old('city', $user->city)" />
+                                    <x-input-error :messages="$errors->get('city')" class="mt-2" />
+                                </div>
+
+                                <!-- County -->
+                                <div>
+                                    <x-input-label for="county" :value="__('County')" />
+                                    <x-text-input id="county" name="county" type="text" class="mt-1 block w-full" :value="old('county', $user->county)" />
+                                    <x-input-error :messages="$errors->get('county')" class="mt-2" />
+                                </div>
+
+                                <!-- Postcode -->
+                                <div>
+                                    <x-input-label for="postcode" :value="__('Postcode')" />
+                                    <x-text-input id="postcode" name="postcode" type="text" class="mt-1 block w-full" :value="old('postcode', $user->postcode)" />
+                                    <x-input-error :messages="$errors->get('postcode')" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Employment Details -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Employment Details</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Employee ID -->
+                                <div>
+                                    <x-input-label for="employee_id" :value="__('Employee ID')" />
+                                    <x-text-input id="employee_id" name="employee_id" type="text" class="mt-1 block w-full" :value="old('employee_id', $user->employee_id)" />
+                                    <x-input-error :messages="$errors->get('employee_id')" class="mt-2" />
+                                </div>
+
+                                <!-- Department -->
+                                <div>
+                                    <x-input-label for="department" :value="__('Department')" />
+                                    <x-text-input id="department" name="department" type="text" class="mt-1 block w-full" :value="old('department', $user->department)" />
+                                    <x-input-error :messages="$errors->get('department')" class="mt-2" />
+                                </div>
+
+                                <!-- Position -->
+                                <div>
+                                    <x-input-label for="position" :value="__('Position')" />
+                                    <x-text-input id="position" name="position" type="text" class="mt-1 block w-full" :value="old('position', $user->position)" />
+                                    <x-input-error :messages="$errors->get('position')" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Professional Information -->
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Professional Information</h3>
@@ -219,9 +287,9 @@
                         </div>
 
                         <!-- Submit Button -->
-                        <div class="flex items-center justify-end mt-6">
+                        <div class="flex items-center justify-end">
                             <x-primary-button>
-                                {{ __('Update Profile') }}
+                                {{ __('Save Changes') }}
                             </x-primary-button>
                         </div>
                     </form>

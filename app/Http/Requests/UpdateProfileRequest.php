@@ -43,11 +43,18 @@ class UpdateProfileRequest extends FormRequest
             'brp_document' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
             'has_criminal_convictions' => ['nullable', 'boolean'],
             'signature' => ['nullable', 'image', 'max:2048'], // 2MB max
-            'address_line_1' => ['required', 'string', 'max:255'],
+            
+            // Address fields (optional)
+            'address_line_1' => ['nullable', 'string', 'max:255'],
             'address_line_2' => ['nullable', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'county' => ['required', 'string', 'max:255'],
-            'postcode' => ['required', 'string', 'max:10'],
+            'city' => ['nullable', 'string', 'max:255'],
+            'county' => ['nullable', 'string', 'max:255'],
+            'postcode' => ['nullable', 'string', 'max:10'],
+            
+            // Employment details fields
+            'employee_id' => ['nullable', 'string', 'max:255'],
+            'department' => ['nullable', 'string', 'max:255'],
+            'position' => ['nullable', 'string', 'max:255'],
         ];
     }
 

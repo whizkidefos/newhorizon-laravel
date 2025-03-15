@@ -5,6 +5,13 @@
 @section('content')
     <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <!-- Success Message -->
+            @if (session('success') || session('status') === 'profile-updated' || session('message'))
+                <div class="mb-4 font-medium text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-4 rounded-md">
+                    {{ session('success') ?? session('message') ?? 'Profile updated successfully.' }}
+                </div>
+            @endif
+
             <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="flex items-center justify-between mb-6">
@@ -18,24 +25,35 @@
                         <div class="space-y-4">
                             <div class="flex items-center space-x-4">
                                 <div class="w-16 h-16 overflow-hidden rounded-full">
-                                    @if(Auth::user()->profile_photo_path)
-                                        <img src="{{ asset('storage/' . Auth::user()->profile_photo_path) }}" alt="{{ Auth::user()->name }}" class="object-cover w-full h-full">
+                                    @if(Auth::user()->profile_photo)
+                                        <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}" class="object-cover w-full h-full">
                                     @else
                                         <div class="flex items-center justify-center w-full h-full text-2xl text-white bg-blue-500">
-                                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                            {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}
                                         </div>
                                     @endif
                                 </div>
                                 <div>
-                                    <h2 class="text-xl font-semibold">{{ Auth::user()->name }}</h2>
+                                    <h2 class="text-xl font-semibold">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h2>
                                     <p class="text-gray-600 dark:text-gray-400">{{ Auth::user()->email }}</p>
                                 </div>
                             </div>
 
                             <div>
                                 <h3 class="text-lg font-medium">Contact Information</h3>
-                                <p class="mt-1 text-gray-600 dark:text-gray-400">Phone: {{ Auth::user()->phone ?? 'Not provided' }}</p>
-                                <p class="text-gray-600 dark:text-gray-400">Address: {{ Auth::user()->address ?? 'Not provided' }}</p>
+                                <p class="mt-1 text-gray-600 dark:text-gray-400">Phone: {{ Auth::user()->mobile_number ?? 'Not provided' }}</p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Address: 
+                                    @if(Auth::user()->address_line_1)
+                                        {{ Auth::user()->address_line_1 }}
+                                        @if(Auth::user()->address_line_2), {{ Auth::user()->address_line_2 }}@endif
+                                        @if(Auth::user()->city), {{ Auth::user()->city }}@endif
+                                        @if(Auth::user()->county), {{ Auth::user()->county }}@endif
+                                        @if(Auth::user()->postcode), {{ Auth::user()->postcode }}@endif
+                                    @else
+                                        Not provided
+                                    @endif
+                                </p>
                             </div>
 
                             <div>
@@ -65,6 +83,13 @@
                                     </div>
                                 </div>
                             @endif
+
+                            <div>
+                                <h3 class="text-lg font-medium">Professional Details</h3>
+                                <p class="mt-1 text-gray-600 dark:text-gray-400">Job Role: {{ Auth::user()->job_role ?? 'Not specified' }}</p>
+                                <p class="text-gray-600 dark:text-gray-400">NI Number: {{ Auth::user()->national_insurance_number ?? 'Not provided' }}</p>
+                                <p class="text-gray-600 dark:text-gray-400">Nationality: {{ Auth::user()->nationality ?? 'Not specified' }}</p>
+                            </div>
                         </div>
                     </div>
 

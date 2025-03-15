@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shift;
+use App\Models\Timesheet;
 use Illuminate\Http\Request;
 use App\Exports\TimesheetExport;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ShiftController extends Controller
 {
@@ -49,9 +52,69 @@ class ShiftController extends Controller
                 'status' => 'completed',
                 'checked_out_at' => now()
             ]);
-            return back()->with('success', 'Checked out successfully.');
+            
+            // Redirect to a page that offers timesheet submission and complaint options
+            return redirect()->route('shifts.checkout-options', $shift)
+                ->with('success', 'Checked out successfully. Would you like to submit a timesheet or report any issues?');
         }
         return back()->with('error', 'Unable to check out from this shift.');
+    }
+
+    /**
+     * Show options after checkout (submit timesheet or complaint)
+     */
+    public function checkoutOptions(Shift $shift)
+    {
+        // Ensure the shift belongs to the authenticated user and is completed
+        if ($shift->user_id !== Auth::id() || $shift->status !== 'completed') {
+            return redirect()->route('shifts.my')->with('error', 'Invalid shift access.');
+        }
+
+        return view('shifts.checkout-options', compact('shift'));
+    }
+
+    /**
+     * Quick submit timesheet from shift checkout
+     */
+    public function quickSubmitTimesheet(Request $request, Shift $shift)
+    {
+        // Ensure the shift belongs to the authenticated user and is completed
+        if ($shift->user_id !== Auth::id() || $shift->status !== 'completed') {
+            return redirect()->route('shifts.my')->with('error', 'Invalid shift access.');
+        }
+
+        $validated = $request->validate([
+            'tasks_completed' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'break_duration' => 'required|numeric|min:0',
+        ]);
+
+        // Calculate hours worked
+        $startTime = Carbon::parse($shift->checked_in_at);
+        $endTime = Carbon::parse($shift->checked_out_at);
+        $hoursWorked = $endTime->diffInMinutes($startTime) / 60;
+        
+        // Subtract break duration
+        $hoursWorked -= $validated['break_duration'];
+
+        // Create timesheet
+        $timesheet = new Timesheet([
+            'user_id' => Auth::id(),
+            'shift_id' => $shift->id,
+            'date' => $shift->date,
+            'start_time' => $shift->checked_in_at,
+            'end_time' => $shift->checked_out_at,
+            'hours_worked' => $hoursWorked,
+            'break_duration' => $validated['break_duration'],
+            'tasks_completed' => $validated['tasks_completed'],
+            'notes' => $validated['notes'],
+            'status' => 'pending',
+        ]);
+
+        $timesheet->save();
+
+        return redirect()->route('shifts.my')
+            ->with('success', 'Timesheet submitted successfully and is pending approval.');
     }
 
     public function timesheets()
