@@ -57,10 +57,10 @@
                                     @foreach($shifts as $shift)
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                {{ $shift->date->format('M d, Y') }}
+                                                {{ $shift->start_datetime->format('M d, Y') }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                {{ $shift->start_time->format('g:i A') }} - {{ $shift->end_time->format('g:i A') }}
+                                                {{ $shift->start_datetime->format('g:i A') }} - {{ $shift->end_datetime->format('g:i A') }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                 {{ $shift->location }}

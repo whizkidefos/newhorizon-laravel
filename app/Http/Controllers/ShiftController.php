@@ -159,7 +159,7 @@ class ShiftController extends Controller
     public function myShifts()
     {
         $user = auth()->user();
-        $shifts = $user->shifts()->with(['facility'])->latest()->paginate(10);
+        $shifts = $user->shifts()->with(['location'])->latest()->paginate(10);
 
         return view('shifts.my-shifts', compact('shifts'));
     }

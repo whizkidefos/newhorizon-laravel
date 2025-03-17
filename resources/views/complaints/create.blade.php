@@ -41,9 +41,9 @@
                             <x-input-label for="shift_id" :value="__('Related Shift (Optional)')" />
                             <select id="shift_id" name="shift_id" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                 <option value="">No related shift</option>
-                                @foreach(auth()->user()->shifts()->whereIn('status', ['completed'])->orderBy('date', 'desc')->get() as $shift)
+                                @foreach(auth()->user()->shifts()->whereIn('status', ['completed'])->orderBy('start_datetime', 'desc')->get() as $shift)
                                     <option value="{{ $shift->id }}" {{ old('shift_id') == $shift->id ? 'selected' : '' }}>
-                                        {{ $shift->date->format('M d, Y') }} - {{ $shift->location }}
+                                        {{ $shift->start_datetime->format('M d, Y') }} - {{ $shift->location }}
                                     </option>
                                 @endforeach
                             </select>

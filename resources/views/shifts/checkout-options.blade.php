@@ -1,103 +1,102 @@
-@extends('layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Shift Completed - Next Steps') }}
+        </h2>
+    </x-slot>
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Shift Completed - Next Steps</h4>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle me-2"></i> You have successfully checked out from your shift.
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 dark:bg-green-900 dark:text-green-200 mb-6" role="alert">
+                        <p class="font-bold">Success</p>
+                        <p>You have successfully checked out from your shift.</p>
                     </div>
 
-                    <h5 class="mt-4 mb-3">Shift Details</h5>
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <p><strong>Date:</strong> {{ $shift->date }}</p>
-                            <p><strong>Location:</strong> {{ $shift->location }}</p>
+                    <h3 class="text-lg font-medium mb-4">Shift Details</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <p class="mb-2"><strong>Date:</strong> {{ $shift->start_datetime->format('M d, Y') }}</p>
+                            <p class="mb-2"><strong>Location:</strong> {{ $shift->location }}</p>
                         </div>
-                        <div class="col-md-6">
-                            <p><strong>Check-in Time:</strong> {{ \Carbon\Carbon::parse($shift->checked_in_at)->format('h:i A') }}</p>
-                            <p><strong>Check-out Time:</strong> {{ \Carbon\Carbon::parse($shift->checked_out_at)->format('h:i A') }}</p>
-                            <p><strong>Duration:</strong> {{ \Carbon\Carbon::parse($shift->checked_in_at)->diffForHumans(\Carbon\Carbon::parse($shift->checked_out_at), true) }}</p>
+                        <div>
+                            <p class="mb-2"><strong>Check-in Time:</strong> {{ \Carbon\Carbon::parse($shift->checked_in_at)->format('h:i A') }}</p>
+                            <p class="mb-2"><strong>Check-out Time:</strong> {{ \Carbon\Carbon::parse($shift->checked_out_at)->format('h:i A') }}</p>
+                            <p class="mb-2"><strong>Duration:</strong> {{ \Carbon\Carbon::parse($shift->checked_in_at)->diffForHumans(\Carbon\Carbon::parse($shift->checked_out_at), true) }}</p>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card mb-4 h-100">
-                                <div class="card-header bg-success text-white">
-                                    <h5 class="mb-0">Submit Timesheet</h5>
-                                </div>
-                                <div class="card-body">
-                                    <p>Submit your timesheet for this shift to record your hours worked and get paid.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-gray-700 shadow rounded-lg overflow-hidden">
+                            <div class="bg-green-600 px-4 py-3">
+                                <h3 class="text-lg font-medium text-white">Submit Timesheet</h3>
+                            </div>
+                            <div class="p-6">
+                                <p class="mb-4 text-gray-700 dark:text-gray-300">Submit your timesheet for this shift to record your hours worked and get paid.</p>
+                                
+                                <form action="{{ route('shifts.quick-timesheet', $shift) }}" method="POST">
+                                    @csrf
+                                    <div class="mb-4">
+                                        <label for="break_duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Break Duration (hours)</label>
+                                        <input type="number" class="w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                                            id="break_duration" name="break_duration" step="0.25" min="0" value="0" required>
+                                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Enter your total break time in hours (e.g., 0.5 for 30 minutes)</p>
+                                    </div>
                                     
-                                    <form action="{{ route('shifts.quick-timesheet', $shift) }}" method="POST">
-                                        @csrf
-                                        <div class="mb-3">
-                                            <label for="break_duration" class="form-label">Break Duration (hours)</label>
-                                            <input type="number" class="form-control" id="break_duration" name="break_duration" step="0.25" min="0" value="0" required>
-                                            <div class="form-text">Enter your total break time in hours (e.g., 0.5 for 30 minutes)</div>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <label for="tasks_completed" class="form-label">Tasks Completed</label>
-                                            <textarea class="form-control" id="tasks_completed" name="tasks_completed" rows="3" placeholder="List the main tasks you completed during this shift"></textarea>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <label for="notes" class="form-label">Additional Notes</label>
-                                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Any additional information about your shift"></textarea>
-                                        </div>
-                                        
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-clock me-1"></i> Submit Timesheet
-                                        </button>
-                                    </form>
-                                </div>
+                                    <div class="mb-4">
+                                        <label for="tasks_completed" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tasks Completed</label>
+                                        <textarea class="w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                                            id="tasks_completed" name="tasks_completed" rows="3" placeholder="List the main tasks you completed during this shift"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Additional Notes</label>
+                                        <textarea class="w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                                            id="notes" name="notes" rows="3" placeholder="Any additional information about your shift"></textarea>
+                                    </div>
+                                    
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-800 focus:outline-none focus:border-green-800 focus:ring focus:ring-green-300 disabled:opacity-25 transition">
+                                        Submit Timesheet
+                                    </button>
+                                </form>
                             </div>
                         </div>
                         
-                        <div class="col-md-6">
-                            <div class="card mb-4 h-100">
-                                <div class="card-header bg-warning text-dark">
-                                    <h5 class="mb-0">Report an Issue</h5>
+                        <div class="bg-white dark:bg-gray-700 shadow rounded-lg overflow-hidden">
+                            <div class="bg-yellow-600 px-4 py-3">
+                                <h3 class="text-lg font-medium text-white">Report an Issue</h3>
+                            </div>
+                            <div class="p-6">
+                                <p class="mb-4 text-gray-700 dark:text-gray-300">If you experienced any issues during your shift, please submit a complaint.</p>
+                                
+                                <div class="mb-4">
+                                    <a href="{{ route('complaints.create-from-shift', $shift) }}" class="inline-flex items-center justify-center w-full px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-700 active:bg-yellow-800 focus:outline-none focus:border-yellow-800 focus:ring focus:ring-yellow-300 disabled:opacity-25 transition">
+                                        File a Complaint
+                                    </a>
                                 </div>
-                                <div class="card-body">
-                                    <p>If you experienced any issues during your shift, please submit a complaint.</p>
-                                    
-                                    <div class="d-grid gap-2">
-                                        <a href="{{ route('complaints.create-from-shift', $shift) }}" class="btn btn-warning">
-                                            <i class="fas fa-exclamation-triangle me-1"></i> File a Complaint
-                                        </a>
-                                    </div>
-                                    
-                                    <div class="mt-3">
-                                        <p><strong>When to file a complaint:</strong></p>
-                                        <ul>
-                                            <li>Safety concerns at the workplace</li>
-                                            <li>Issues with equipment or facilities</li>
-                                            <li>Scheduling or staffing problems</li>
-                                            <li>Workplace conflicts</li>
-                                            <li>Any other concerns that affected your work</li>
-                                        </ul>
-                                    </div>
+                                
+                                <div>
+                                    <p class="font-medium mb-2 text-gray-700 dark:text-gray-300">When to file a complaint:</p>
+                                    <ul class="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
+                                        <li>Safety concerns at the workplace</li>
+                                        <li>Issues with equipment or facilities</li>
+                                        <li>Scheduling or staffing problems</li>
+                                        <li>Workplace conflicts</li>
+                                        <li>Any other concerns that affected your work</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="mt-4 text-center">
-                        <a href="{{ route('shifts.my') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-1"></i> Back to My Shifts
+                    <div class="mt-6 text-center">
+                        <a href="{{ route('shifts.my') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-300 uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-600 active:bg-gray-500 dark:active:bg-gray-500 focus:outline-none focus:border-gray-500 focus:ring focus:ring-gray-300 disabled:opacity-25 transition">
+                            Back to My Shifts
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-app-layout>
