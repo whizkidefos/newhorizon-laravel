@@ -20,6 +20,9 @@
                     <x-nav-link :href="route('admin.shifts.index')" :active="request()->routeIs('admin.shifts.*')">
                         Shifts
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.shift-locations.index')" :active="request()->routeIs('admin.shift-locations.*')">
+                        Shift Locations
+                    </x-nav-link>
                     <x-nav-link :href="route('admin.courses.index')" :active="request()->routeIs('admin.courses.*')">
                         Courses
                     </x-nav-link>
@@ -86,6 +89,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.shifts.index')" :active="request()->routeIs('admin.shifts.*')">
                 Shifts
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.shift-locations.index')" :active="request()->routeIs('admin.shift-locations.*')">
+                Shift Locations
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.courses.index')" :active="request()->routeIs('admin.courses.*')">
                 Courses

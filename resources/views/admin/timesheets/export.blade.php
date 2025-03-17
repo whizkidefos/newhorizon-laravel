@@ -1,197 +1,210 @@
-@extends('layouts.admin')
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Export Timesheets') }}
+            </h2>
+            <div>
+                <a href="{{ route('admin.timesheets.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-600 focus:bg-gray-700 dark:focus:bg-gray-600 active:bg-gray-900 dark:active:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    {{ __('Back to Timesheets') }}
+                </a>
+            </div>
+        </div>
+    </x-slot>
 
-@section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-10 mx-auto">
-            <div class="card">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Export Timesheets</h4>
-                    <div>
-                        <a href="{{ route('admin.timesheets.index') }}" class="btn btn-light">
-                            <i class="fas fa-arrow-left me-1"></i> Back to Timesheets
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body">
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
                     @if(session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <span class="block sm:inline">{{ session('success') }}</span>
                         </div>
                     @endif
-                    
+
                     @if(session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <span class="block sm:inline">{{ session('error') }}</span>
                         </div>
                     @endif
 
                     <form action="{{ route('admin.timesheets.export.download') }}" method="POST" class="mb-4">
                         @csrf
-                        <div class="row mb-4">
-                            <div class="col-md-12">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h5 class="card-title mb-3">Filter Options</h5>
-                                        <div class="row g-3">
-                                            <div class="col-md-4">
-                                                <label for="user_id" class="form-label">Employee</label>
-                                                <select class="form-select" id="user_id" name="user_id">
-                                                    <option value="">All Employees</option>
-                                                    @foreach($users as $user)
-                                                        <option value="{{ $user->id }}">
-                                                            {{ $user->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="status" class="form-label">Status</label>
-                                                <select class="form-select" id="status" name="status">
-                                                    <option value="">All Statuses</option>
-                                                    <option value="pending">Pending</option>
-                                                    <option value="approved">Approved</option>
-                                                    <option value="rejected">Rejected</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="date_range" class="form-label">Date Range</label>
-                                                <select class="form-select" id="date_range" name="date_range">
-                                                    <option value="all">All Time</option>
-                                                    <option value="this_week">This Week</option>
-                                                    <option value="last_week">Last Week</option>
-                                                    <option value="this_month">This Month</option>
-                                                    <option value="last_month">Last Month</option>
-                                                    <option value="custom">Custom Range</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="row g-3 mt-2" id="custom_date_range" style="display: none;">
-                                            <div class="col-md-6">
-                                                <label for="date_from" class="form-label">Date From</label>
-                                                <input type="date" class="form-control" id="date_from" name="date_from">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="date_to" class="form-label">Date To</label>
-                                                <input type="date" class="form-control" id="date_to" name="date_to">
-                                            </div>
-                                        </div>
+                        <div class="mb-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                                <h5 class="font-medium text-lg mb-4">Filter Timesheets</h5>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div>
+                                        <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Employee</label>
+                                        <select id="user_id" name="user_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 shadow-sm">
+                                            <option value="">All Employees</option>
+                                            @foreach($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                                        <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 shadow-sm">
+                                            <option value="">All Statuses</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="approved">Approved</option>
+                                            <option value="rejected">Rejected</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="date_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date From</label>
+                                        <input type="date" id="date_from" name="date_from" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 shadow-sm">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="date_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date To</label>
+                                        <input type="date" id="date_to" name="date_to" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 shadow-sm">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <h5 class="mb-0">Export Format</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Select Format</label>
-                                            <div class="d-flex flex-wrap gap-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="format" id="format_csv" value="csv" checked>
-                                                    <label class="form-check-label" for="format_csv">
-                                                        <i class="fas fa-file-csv text-primary me-1"></i> CSV
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="format" id="format_pdf" value="pdf">
-                                                    <label class="form-check-label" for="format_pdf">
-                                                        <i class="fas fa-file-pdf text-danger me-1"></i> PDF
-                                                    </label>
-                                                </div>
-                                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                                <div class="p-6 text-gray-900 dark:text-gray-100">
+                                    <h5 class="font-medium text-lg mb-4">Export Format</h5>
+                                    
+                                    <div class="space-y-4">
+                                        <div class="flex items-center">
+                                            <input id="format_excel" name="format" type="radio" value="excel" checked class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                            <label for="format_excel" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                Excel (.xlsx)
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center">
+                                            <input id="format_csv" name="format" type="radio" value="csv" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                            <label for="format_csv" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                CSV (.csv)
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="flex items-center">
+                                            <input id="format_pdf" name="format" type="radio" value="pdf" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                                            <label for="format_pdf" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                PDF (.pdf)
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <h5 class="mb-0">Columns to Include</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input" type="checkbox" id="include_all" checked>
-                                                    <label class="form-check-label fw-bold" for="include_all">
-                                                        Select All
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_id" value="id" checked>
-                                                    <label class="form-check-label" for="col_id">
-                                                        ID
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_employee" value="employee" checked>
-                                                    <label class="form-check-label" for="col_employee">
-                                                        Employee Name
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_date" value="date" checked>
-                                                    <label class="form-check-label" for="col_date">
-                                                        Date
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_start_time" value="start_time" checked>
-                                                    <label class="form-check-label" for="col_start_time">
-                                                        Start Time
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_end_time" value="end_time" checked>
-                                                    <label class="form-check-label" for="col_end_time">
-                                                        End Time
-                                                    </label>
-                                                </div>
+                            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                                <div class="p-6 text-gray-900 dark:text-gray-100">
+                                    <h5 class="font-medium text-lg mb-4">Columns to Include</h5>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="space-y-2">
+                                            <div class="flex items-center">
+                                                <input id="include_all" type="checkbox" checked class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_all" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Select All
+                                                </label>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="form-check mb-2 invisible">
-                                                    <input class="form-check-input" type="checkbox">
-                                                    <label class="form-check-label">
-                                                        &nbsp;
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_hours_worked" value="hours_worked" checked>
-                                                    <label class="form-check-label" for="col_hours_worked">
-                                                        Hours Worked
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_break_duration" value="break_duration" checked>
-                                                    <label class="form-check-label" for="col_break_duration">
-                                                        Break Duration
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_status" value="status" checked>
-                                                    <label class="form-check-label" for="col_status">
-                                                        Status
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_tasks" value="tasks" checked>
-                                                    <label class="form-check-label" for="col_tasks">
-                                                        Tasks Completed
-                                                    </label>
-                                                </div>
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input column-checkbox" type="checkbox" name="columns[]" id="col_notes" value="notes" checked>
-                                                    <label class="form-check-label" for="col_notes">
-                                                        Notes
-                                                    </label>
-                                                </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_id" name="columns[]" type="checkbox" value="id" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_id" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    ID
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_employee" name="columns[]" type="checkbox" value="employee" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_employee" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Employee Name
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_date" name="columns[]" type="checkbox" value="date" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_date" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Date
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_start_time" name="columns[]" type="checkbox" value="start_time" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_start_time" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Start Time
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_end_time" name="columns[]" type="checkbox" value="end_time" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_end_time" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    End Time
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_hours_worked" name="columns[]" type="checkbox" value="hours_worked" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_hours_worked" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Hours Worked
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="space-y-2">
+                                            <div class="flex items-center invisible">
+                                                <input type="checkbox" class="h-4 w-4">
+                                                <label class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    &nbsp;
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_break_duration" name="columns[]" type="checkbox" value="break_duration" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_break_duration" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Break Duration
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_status" name="columns[]" type="checkbox" value="status" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_status" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Status
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_tasks" name="columns[]" type="checkbox" value="tasks_completed" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_tasks" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Tasks Completed
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_notes" name="columns[]" type="checkbox" value="notes" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_notes" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Notes
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_submitted_at" name="columns[]" type="checkbox" value="created_at" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_submitted_at" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Submitted At
+                                                </label>
+                                            </div>
+                                            
+                                            <div class="flex items-center">
+                                                <input id="include_updated_at" name="columns[]" type="checkbox" value="updated_at" checked class="column-checkbox h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                                <label for="include_updated_at" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Updated At
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -199,9 +212,12 @@
                             </div>
                         </div>
                         
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-file-export me-1"></i> Export Timesheets
+                        <div class="flex justify-end">
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Export Timesheets
                             </button>
                         </div>
                     </form>
@@ -209,41 +225,31 @@
             </div>
         </div>
     </div>
-</div>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle date range selection
-        const dateRangeSelect = document.getElementById('date_range');
-        const customDateRange = document.getElementById('custom_date_range');
-        
-        dateRangeSelect.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                customDateRange.style.display = 'flex';
-            } else {
-                customDateRange.style.display = 'none';
-            }
-        });
-        
-        // Handle select all checkbox
-        const includeAllCheckbox = document.getElementById('include_all');
-        const columnCheckboxes = document.querySelectorAll('.column-checkbox');
-        
-        includeAllCheckbox.addEventListener('change', function() {
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle "Select All" checkbox
+            const selectAllCheckbox = document.getElementById('include_all');
+            const columnCheckboxes = document.querySelectorAll('.column-checkbox');
+            
+            selectAllCheckbox.addEventListener('change', function() {
+                columnCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+            
+            // Update "Select All" checkbox when individual checkboxes change
             columnCheckboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
+                checkbox.addEventListener('change', function() {
+                    const allChecked = Array.from(columnCheckboxes).every(cb => cb.checked);
+                    const anyChecked = Array.from(columnCheckboxes).some(cb => cb.checked);
+                    
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = !allChecked && anyChecked;
+                });
             });
         });
-        
-        // Update select all checkbox when individual checkboxes change
-        columnCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const allChecked = Array.from(columnCheckboxes).every(c => c.checked);
-                includeAllCheckbox.checked = allChecked;
-            });
-        });
-    });
-</script>
-@endpush
-@endsection
+    </script>
+    @endpush
+</x-app-layout>

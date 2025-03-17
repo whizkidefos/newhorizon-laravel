@@ -64,16 +64,21 @@
 
                     <!-- Location and Rate -->
                     <div class="col-span-2 md:col-span-1">
-                        <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <label for="location_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             Location
                         </label>
-                        <input type="text" 
-                               id="location" 
-                               name="location" 
-                               value="{{ old('location', $shift->location) }}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                               {{ $shift->status !== 'open' ? 'disabled' : '' }}>
-                        @error('location')
+                        <select id="location_id" 
+                                name="location_id" 
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                {{ $shift->status !== 'open' ? 'disabled' : '' }}>
+                            <option value="">Select a location</option>
+                            @foreach($locations as $location)
+                                <option value="{{ $location->id }}" {{ old('location_id', $shift->location_id) == $location->id ? 'selected' : '' }}>
+                                    {{ $location->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('location_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

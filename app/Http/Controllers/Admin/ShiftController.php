@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Shift;
 use App\Models\User;
+use App\Models\ShiftLocation;
 use Illuminate\Http\Request;
 use App\Http\Requests\Admin\ShiftRequest;
 
@@ -42,8 +43,10 @@ class ShiftController extends Controller
         $users = User::where('is_admin', false)
             ->where('is_active', true)
             ->get();
+        
+        $locations = ShiftLocation::where('is_active', true)->get();
 
-        return view('admin.shifts.create', compact('users'));
+        return view('admin.shifts.create', compact('users', 'locations'));
     }
 
     public function store(ShiftRequest $request)
@@ -71,10 +74,13 @@ class ShiftController extends Controller
         $users = User::where('is_admin', false)
             ->where('is_active', true)
             ->get();
+        
+        $locations = ShiftLocation::where('is_active', true)->get();
 
         return view('admin.shifts.edit', [
             'shift' => $shift,
-            'users' => $users
+            'users' => $users,
+            'locations' => $locations
         ]);
     }
 

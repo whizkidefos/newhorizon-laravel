@@ -1,22 +1,27 @@
-@extends('layouts.admin')
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Edit Timesheet') }}
+            </h2>
+            <div>
+                <a href="{{ route('admin.timesheets.show', $timesheet) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-600 focus:bg-gray-700 dark:focus:bg-gray-600 active:bg-gray-900 dark:active:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    {{ __('Back to Timesheet') }}
+                </a>
+            </div>
+        </div>
+    </x-slot>
 
-@section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-10 mx-auto">
-            <div class="card">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">Edit Timesheet</h4>
-                    <div>
-                        <a href="{{ route('admin.timesheets.show', $timesheet) }}" class="btn btn-light">
-                            <i class="fas fa-arrow-left me-1"></i> Back to Timesheet
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body">
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
                     @if(session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <span class="block sm:inline">{{ session('error') }}</span>
                         </div>
                     @endif
 
@@ -24,7 +29,7 @@
                         @csrf
                         @method('PUT')
                         
-                        <div class="row mb-3">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <div class="col-md-6">
                                 <label for="user_id" class="form-label">Employee</label>
                                 <select class="form-select @error('user_id') is-invalid @enderror" id="user_id" name="user_id" required>
@@ -55,7 +60,7 @@
                             </div>
                         </div>
                         
-                        <div class="row mb-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             <div class="col-md-4">
                                 <label for="date" class="form-label">Date</label>
                                 <input type="date" class="form-control @error('date') is-invalid @enderror" id="date" name="date" value="{{ old('date', $timesheet->date->format('Y-m-d')) }}" required>
@@ -79,7 +84,7 @@
                             </div>
                         </div>
                         
-                        <div class="row mb-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             <div class="col-md-4">
                                 <label for="break_duration" class="form-label">Break Duration (hours)</label>
                                 <input type="number" class="form-control @error('break_duration') is-invalid @enderror" id="break_duration" name="break_duration" value="{{ old('break_duration', $timesheet->break_duration) }}" step="0.01" min="0" required>
@@ -107,7 +112,7 @@
                             </div>
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-6">
                             <label for="tasks_completed" class="form-label">Tasks Completed</label>
                             <textarea class="form-control @error('tasks_completed') is-invalid @enderror" id="tasks_completed" name="tasks_completed" rows="4">{{ old('tasks_completed', $timesheet->tasks_completed) }}</textarea>
                             @error('tasks_completed')
@@ -115,7 +120,7 @@
                             @enderror
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-6">
                             <label for="notes" class="form-label">Additional Notes</label>
                             <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="4">{{ old('notes', $timesheet->notes) }}</textarea>
                             @error('notes')
@@ -123,7 +128,7 @@
                             @enderror
                         </div>
                         
-                        <div id="rejection-reason-container" class="mb-3" style="{{ old('status', $timesheet->status) == 'rejected' ? '' : 'display: none;' }}">
+                        <div id="rejection-reason-container" class="mb-6" style="{{ old('status', $timesheet->status) == 'rejected' ? '' : 'display: none;' }}">
                             <label for="rejection_reason" class="form-label">Rejection Reason</label>
                             <textarea class="form-control @error('rejection_reason') is-invalid @enderror" id="rejection_reason" name="rejection_reason" rows="3">{{ old('rejection_reason', $timesheet->rejection_reason) }}</textarea>
                             <div class="form-text">Please provide a clear reason for rejecting this timesheet. This will be visible to the employee.</div>
@@ -133,11 +138,17 @@
                         </div>
                         
                         <div class="d-flex justify-content-between mt-4">
-                            <a href="{{ route('admin.timesheets.show', $timesheet) }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-times me-1"></i> Cancel
+                            <a href="{{ route('admin.timesheets.show', $timesheet) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-600 focus:bg-gray-700 dark:focus:bg-gray-600 active:bg-gray-900 dark:active:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                {{ __('Cancel') }}
                             </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> Update Timesheet
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-600 focus:bg-gray-700 dark:focus:bg-gray-600 active:bg-gray-900 dark:active:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                </svg>
+                                {{ __('Update Timesheet') }}
                             </button>
                         </div>
                     </form>
@@ -145,56 +156,55 @@
             </div>
         </div>
     </div>
-</div>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Auto-calculate hours worked
-        const startTimeInput = document.getElementById('start_time');
-        const endTimeInput = document.getElementById('end_time');
-        const breakDurationInput = document.getElementById('break_duration');
-        const hoursWorkedInput = document.getElementById('hours_worked');
-        
-        function calculateHoursWorked() {
-            if (startTimeInput.value && endTimeInput.value) {
-                const startTime = new Date(`2000-01-01T${startTimeInput.value}:00`);
-                const endTime = new Date(`2000-01-01T${endTimeInput.value}:00`);
-                
-                // If end time is before start time, assume it's the next day
-                let diff = endTime - startTime;
-                if (diff < 0) {
-                    diff += 24 * 60 * 60 * 1000; // Add a day in milliseconds
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-calculate hours worked
+            const startTimeInput = document.getElementById('start_time');
+            const endTimeInput = document.getElementById('end_time');
+            const breakDurationInput = document.getElementById('break_duration');
+            const hoursWorkedInput = document.getElementById('hours_worked');
+            
+            function calculateHoursWorked() {
+                if (startTimeInput.value && endTimeInput.value) {
+                    const startTime = new Date(`2000-01-01T${startTimeInput.value}:00`);
+                    const endTime = new Date(`2000-01-01T${endTimeInput.value}:00`);
+                    
+                    // If end time is before start time, assume it's the next day
+                    let diff = endTime - startTime;
+                    if (diff < 0) {
+                        diff += 24 * 60 * 60 * 1000; // Add a day in milliseconds
+                    }
+                    
+                    // Convert to hours and subtract break duration
+                    let hours = diff / (1000 * 60 * 60);
+                    const breakDuration = parseFloat(breakDurationInput.value) || 0;
+                    hours = Math.max(0, hours - breakDuration);
+                    
+                    // Round to 2 decimal places
+                    hoursWorkedInput.value = Math.round(hours * 100) / 100;
                 }
-                
-                // Convert to hours and subtract break duration
-                let hours = diff / (1000 * 60 * 60);
-                const breakDuration = parseFloat(breakDurationInput.value) || 0;
-                hours = Math.max(0, hours - breakDuration);
-                
-                // Round to 2 decimal places
-                hoursWorkedInput.value = Math.round(hours * 100) / 100;
             }
-        }
-        
-        startTimeInput.addEventListener('change', calculateHoursWorked);
-        endTimeInput.addEventListener('change', calculateHoursWorked);
-        breakDurationInput.addEventListener('input', calculateHoursWorked);
-        
-        // Show/hide rejection reason based on status
-        const statusSelect = document.getElementById('status');
-        const rejectionReasonContainer = document.getElementById('rejection-reason-container');
-        
-        statusSelect.addEventListener('change', function() {
-            if (this.value === 'rejected') {
-                rejectionReasonContainer.style.display = '';
-                document.getElementById('rejection_reason').setAttribute('required', 'required');
-            } else {
-                rejectionReasonContainer.style.display = 'none';
-                document.getElementById('rejection_reason').removeAttribute('required');
-            }
+            
+            startTimeInput.addEventListener('change', calculateHoursWorked);
+            endTimeInput.addEventListener('change', calculateHoursWorked);
+            breakDurationInput.addEventListener('input', calculateHoursWorked);
+            
+            // Show/hide rejection reason based on status
+            const statusSelect = document.getElementById('status');
+            const rejectionReasonContainer = document.getElementById('rejection-reason-container');
+            
+            statusSelect.addEventListener('change', function() {
+                if (this.value === 'rejected') {
+                    rejectionReasonContainer.style.display = '';
+                    document.getElementById('rejection_reason').setAttribute('required', 'required');
+                } else {
+                    rejectionReasonContainer.style.display = 'none';
+                    document.getElementById('rejection_reason').removeAttribute('required');
+                }
+            });
         });
-    });
-</script>
-@endpush
-@endsection
+    </script>
+    @endpush
+</x-app-layout>

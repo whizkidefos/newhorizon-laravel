@@ -160,6 +160,9 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\AdminMiddleware::cla
     Route::post('/shifts/{shift}/assign', [Admin\ShiftController::class, 'assignUser'])->name('shifts.assign.store');
     Route::get('shifts/{shift}/track', [Admin\ShiftController::class, 'track'])->name('shifts.track');
     
+    // Shift Locations Management
+    Route::resource('shift-locations', Admin\ShiftLocationController::class);
+    
     // Course Management
     Route::resource('courses', Admin\CourseController::class);
     Route::get('courses/{course}/enrollments', [Admin\CourseController::class, 'enrollments'])
