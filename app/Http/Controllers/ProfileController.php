@@ -79,19 +79,7 @@ class ProfileController extends Controller
             $validated['right_to_work_uk'] = $request->boolean('right_to_work_uk');
             $validated['has_criminal_convictions'] = $request->boolean('has_criminal_convictions');
 
-            // Ensure employment details are properly handled
-            $validated['employee_id'] = $request->input('employee_id');
-            $validated['department'] = $request->input('department');
-            $validated['position'] = $request->input('position');
-
-            // Ensure address fields are properly handled
-            $validated['address_line_1'] = $request->input('address_line_1');
-            $validated['address_line_2'] = $request->input('address_line_2');
-            $validated['city'] = $request->input('city');
-            $validated['county'] = $request->input('county');
-            $validated['postcode'] = $request->input('postcode');
-
-            // Update user profile
+            // Update user profile with all fields
             $user->update($validated);
             
             DB::commit();
