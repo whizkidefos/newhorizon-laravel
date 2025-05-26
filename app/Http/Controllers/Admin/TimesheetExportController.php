@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Exports\EnhancedTimesheetExport;
 use App\Models\Timesheet;
 use App\Models\User;
 use Carbon\Carbon;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TimesheetExportController extends Controller
 {
@@ -36,7 +38,7 @@ class TimesheetExportController extends Controller
     {
         // Validate request
         $request->validate([
-            'format' => 'required|in:csv,pdf',
+            'format' => 'required|in:csv,excel,pdf',
             'columns' => 'required|array',
             'columns.*' => 'string',
         ]);
@@ -96,10 +98,15 @@ class TimesheetExportController extends Controller
         $filename = "timesheets_export_{$timestamp}";
 
         // Export based on format
-        if ($format === 'csv') {
-            return $this->exportToCsv($timesheets, $columns, $filename);
-        } else {
-            return $this->exportToPdf($timesheets, $columns, $filename);
+        switch ($format) {
+            case 'csv':
+                return $this->exportToCsv($timesheets, $columns, $filename);
+            case 'excel':
+                return $this->exportToExcel($timesheets, $columns, $filename);
+            case 'pdf':
+                return $this->exportToPdf($timesheets, $columns, $filename);
+            default:
+                return $this->exportToCsv($timesheets, $columns, $filename);
         }
     }
 
@@ -142,6 +149,19 @@ class TimesheetExportController extends Controller
         ];
         
         return Response::stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export data to Excel.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection  $timesheets
+     * @param  array  $columns
+     * @param  string  $filename
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    private function exportToExcel($timesheets, $columns, $filename)
+    {   
+        return Excel::download(new EnhancedTimesheetExport($timesheets, $columns), $filename . '.xlsx');
     }
 
     /**

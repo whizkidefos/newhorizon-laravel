@@ -61,6 +61,13 @@
                             </div>
                         </div>
                     </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 px-5 py-3 border-t border-gray-200 dark:border-gray-700">
+                        <div class="text-sm">
+                            <a href="{{ route('admin.timesheets.dashboard') }}" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                View dashboard
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Complaint Stats Card -->
@@ -75,8 +82,15 @@
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Complaints</div>
                                 <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $totalComplaints }}</div>
-                                <div class="text-sm text-red-600">{{ $openComplaints + $inProgressComplaints }} need attention</div>
+                                <div class="text-sm text-yellow-600">{{ $openComplaints }} open</div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 px-5 py-3 border-t border-gray-200 dark:border-gray-700">
+                        <div class="text-sm">
+                            <a href="{{ route('admin.complaints.dashboard') }}" class="font-medium text-red-600 hover:text-red-500 dark:text-red-400 dark:hover:text-red-300">
+                                View dashboard
+                            </a>
                         </div>
                     </div>
                 </div>

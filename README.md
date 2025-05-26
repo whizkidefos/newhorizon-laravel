@@ -23,7 +23,22 @@ New Horizon Healthcare is a comprehensive employee management system designed sp
   - Available shifts listing
   - Shift booking system
   - Work schedule management
-  - Timesheet tracking
+  - Check-in/check-out functionality
+  - Integrated complaint reporting
+
+- **Timesheet Management**
+  - Automated timesheet creation from shifts
+  - Approval workflow
+  - Advanced filtering and reporting
+  - Excel, CSV, and PDF export options
+  - Comprehensive dashboard with statistics
+
+- **Complaint Management**
+  - Complaint submission during shift checkout
+  - Severity classification
+  - Resolution workflow
+  - Status tracking
+  - Analytics dashboard
 
 - **Document Management**
   - Secure document storage

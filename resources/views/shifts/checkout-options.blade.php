@@ -68,11 +68,47 @@
                                 <h3 class="text-lg font-medium text-white">Report an Issue</h3>
                             </div>
                             <div class="p-6">
-                                <p class="mb-4 text-gray-700 dark:text-gray-300">If you experienced any issues during your shift, please submit a complaint.</p>
+                                <p class="mb-4 text-gray-700 dark:text-gray-300">If you experienced any issues during your shift, you can submit a quick complaint below or file a detailed report.</p>
+                                
+                                <!-- Quick Complaint Form -->
+                                <form action="{{ route('complaints.quick-submit', $shift) }}" method="POST" class="mb-6">
+                                    @csrf
+                                    <input type="hidden" name="shift_id" value="{{ $shift->id }}">
+                                    
+                                    <div class="mb-4">
+                                        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Issue Title</label>
+                                        <input type="text" class="w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                                            id="title" name="title" required placeholder="Brief description of the issue">
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                                        <textarea class="w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
+                                            id="description" name="description" rows="3" required placeholder="Describe what happened"></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label for="severity" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Severity</label>
+                                        <select id="severity" name="severity" class="w-full rounded-md shadow-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                            <option value="low">Low - Minor issue</option>
+                                            <option value="medium" selected>Medium - Moderate concern</option>
+                                            <option value="high">High - Serious problem</option>
+                                            <option value="critical">Critical - Urgent attention needed</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <button type="submit" class="inline-flex items-center justify-center w-full px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-700 active:bg-yellow-800 focus:outline-none focus:border-yellow-800 focus:ring focus:ring-yellow-300 disabled:opacity-25 transition">
+                                        Submit Quick Complaint
+                                    </button>
+                                </form>
+                                
+                                <div class="text-center mb-4">
+                                    <span class="text-gray-500 dark:text-gray-400">OR</span>
+                                </div>
                                 
                                 <div class="mb-4">
-                                    <a href="{{ route('complaints.create-from-shift', $shift) }}" class="inline-flex items-center justify-center w-full px-4 py-2 bg-yellow-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-yellow-700 active:bg-yellow-800 focus:outline-none focus:border-yellow-800 focus:ring focus:ring-yellow-300 disabled:opacity-25 transition">
-                                        File a Complaint
+                                    <a href="{{ route('complaints.create-from-shift', $shift) }}" class="inline-flex items-center justify-center w-full px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-800 focus:outline-none focus:border-gray-800 focus:ring focus:ring-gray-300 disabled:opacity-25 transition">
+                                        File Detailed Complaint
                                     </a>
                                 </div>
                                 

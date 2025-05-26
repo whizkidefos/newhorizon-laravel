@@ -12,6 +12,108 @@ use Carbon\Carbon;
 class TimesheetController extends Controller
 {
     /**
+     * Display the timesheet dashboard with statistics and charts.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function dashboard(Request $request)
+    {
+        // Determine date range for filtering
+        $dateRange = $request->input('date_range', 'this_month');
+        $dateFrom = null;
+        $dateTo = null;
+        
+        switch ($dateRange) {
+            case 'today':
+                $dateFrom = Carbon::today();
+                $dateTo = Carbon::today();
+                break;
+            case 'yesterday':
+                $dateFrom = Carbon::yesterday();
+                $dateTo = Carbon::yesterday();
+                break;
+            case 'this_week':
+                $dateFrom = Carbon::now()->startOfWeek();
+                $dateTo = Carbon::now()->endOfWeek();
+                break;
+            case 'last_week':
+                $dateFrom = Carbon::now()->subWeek()->startOfWeek();
+                $dateTo = Carbon::now()->subWeek()->endOfWeek();
+                break;
+            case 'this_month':
+                $dateFrom = Carbon::now()->startOfMonth();
+                $dateTo = Carbon::now()->endOfMonth();
+                break;
+            case 'last_month':
+                $dateFrom = Carbon::now()->subMonth()->startOfMonth();
+                $dateTo = Carbon::now()->subMonth()->endOfMonth();
+                break;
+            case 'this_year':
+                $dateFrom = Carbon::now()->startOfYear();
+                $dateTo = Carbon::now()->endOfYear();
+                break;
+            case 'custom':
+                $dateFrom = $request->input('date_from') ? Carbon::parse($request->input('date_from')) : Carbon::now()->subMonth();
+                $dateTo = $request->input('date_to') ? Carbon::parse($request->input('date_to')) : Carbon::now();
+                break;
+        }
+        
+        // Base query with date range filter
+        $baseQuery = Timesheet::whereBetween('date', [$dateFrom, $dateTo]);
+        
+        // Get timesheet statistics
+        $totalTimesheets = $baseQuery->count();
+        $pendingTimesheets = $baseQuery->where('status', 'pending')->count();
+        $approvedTimesheets = $baseQuery->where('status', 'approved')->count();
+        $rejectedTimesheets = $baseQuery->where('status', 'rejected')->count();
+        
+        // Get recent timesheets
+        $recentTimesheets = Timesheet::with(['user', 'shift'])
+            ->whereBetween('date', [$dateFrom, $dateTo])
+            ->latest()
+            ->take(10)
+            ->get();
+        
+        // Prepare data for hours worked by day chart
+        $hoursByDay = Timesheet::whereBetween('date', [$dateFrom, $dateTo])
+            ->where('status', '!=', 'rejected')
+            ->select(DB::raw('DATE(date) as day'), DB::raw('SUM(hours_worked) as total_hours'))
+            ->groupBy('day')
+            ->orderBy('day')
+            ->get()
+            ->keyBy('day');
+        
+        // Format data for chart
+        $days = [];
+        $currentDate = clone $dateFrom;
+        $hoursByDayLabels = [];
+        $hoursByDayValues = [];
+        
+        // Limit to 14 days for better visualization if the range is large
+        $maxDays = 14;
+        $dayInterval = max(1, intval($dateFrom->diffInDays($dateTo) / $maxDays));
+        
+        while ($currentDate <= $dateTo) {
+            $dayKey = $currentDate->format('Y-m-d');
+            $hoursByDayLabels[] = $currentDate->format('M d');
+            $hoursByDayValues[] = isset($hoursByDay[$dayKey]) ? round($hoursByDay[$dayKey]->total_hours, 2) : 0;
+            
+            $currentDate->addDays($dayInterval);
+        }
+        
+        return view('admin.timesheets.dashboard', compact(
+            'totalTimesheets',
+            'pendingTimesheets',
+            'approvedTimesheets',
+            'rejectedTimesheets',
+            'recentTimesheets',
+            'hoursByDayLabels',
+            'hoursByDayValues',
+            'dateRange'
+        ));
+    }
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -28,18 +130,45 @@ class TimesheetController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Filter by date
-        if ($request->has('date') && $request->date) {
-            $query->whereDate('date', $request->date);
-        }
+        // Handle date range filtering
+        if ($request->has('date_range') && $request->date_range) {
+            switch ($request->date_range) {
+                case 'today':
+                    $query->whereDate('date', Carbon::today());
+                    break;
+                case 'yesterday':
+                    $query->whereDate('date', Carbon::yesterday());
+                    break;
+                case 'this_week':
+                    $query->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+                    break;
+                case 'last_week':
+                    $query->whereBetween('date', [Carbon::now()->subWeek()->startOfWeek(), Carbon::now()->subWeek()->endOfWeek()]);
+                    break;
+                case 'this_month':
+                    $query->whereBetween('date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
+                    break;
+                case 'last_month':
+                    $query->whereBetween('date', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()]);
+                    break;
+                case 'this_year':
+                    $query->whereBetween('date', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()]);
+                    break;
+            }
+        } else {
+            // Filter by specific date
+            if ($request->has('date') && $request->date) {
+                $query->whereDate('date', $request->date);
+            }
 
-        // Filter by date range
-        if ($request->has('start_date') && $request->start_date) {
-            $query->whereDate('date', '>=', $request->start_date);
-        }
+            // Filter by custom date range
+            if ($request->has('date_from') && $request->date_from) {
+                $query->whereDate('date', '>=', $request->date_from);
+            }
 
-        if ($request->has('end_date') && $request->end_date) {
-            $query->whereDate('date', '<=', $request->end_date);
+            if ($request->has('date_to') && $request->date_to) {
+                $query->whereDate('date', '<=', $request->date_to);
+            }
         }
 
         $timesheets = $query->latest()->paginate(15);

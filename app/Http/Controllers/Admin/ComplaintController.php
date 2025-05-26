@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ComplaintController extends Controller
 {
@@ -217,6 +218,98 @@ class ComplaintController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Complaint closed successfully.');
+    }
+
+    /**
+     * Export complaints based on filters.
+     */
+    /**
+     * Display the complaint dashboard.
+     */
+    public function dashboard(Request $request)
+    {
+        // Determine date range for filtering
+        $dateRange = $request->input('date_range', 'this_month');
+        $startDate = null;
+        $endDate = null;
+        
+        // Set date range based on selection
+        switch ($dateRange) {
+            case 'today':
+                $startDate = Carbon::today();
+                $endDate = Carbon::today()->endOfDay();
+                break;
+            case 'this_week':
+                $startDate = Carbon::now()->startOfWeek();
+                $endDate = Carbon::now()->endOfWeek();
+                break;
+            case 'last_week':
+                $startDate = Carbon::now()->subWeek()->startOfWeek();
+                $endDate = Carbon::now()->subWeek()->endOfWeek();
+                break;
+            case 'this_month':
+                $startDate = Carbon::now()->startOfMonth();
+                $endDate = Carbon::now()->endOfMonth();
+                break;
+            case 'last_month':
+                $startDate = Carbon::now()->subMonth()->startOfMonth();
+                $endDate = Carbon::now()->subMonth()->endOfMonth();
+                break;
+            case 'this_year':
+                $startDate = Carbon::now()->startOfYear();
+                $endDate = Carbon::now()->endOfYear();
+                break;
+            case 'custom':
+                if ($request->has('date_from') && $request->date_from) {
+                    $startDate = Carbon::parse($request->date_from)->startOfDay();
+                }
+                if ($request->has('date_to') && $request->date_to) {
+                    $endDate = Carbon::parse($request->date_to)->endOfDay();
+                }
+                break;
+        }
+        
+        // Base query with date filtering
+        $baseQuery = Complaint::query();
+        if ($startDate && $endDate) {
+            $baseQuery->whereBetween('created_at', [$startDate, $endDate]);
+        } elseif ($startDate) {
+            $baseQuery->where('created_at', '>=', $startDate);
+        } elseif ($endDate) {
+            $baseQuery->where('created_at', '<=', $endDate);
+        }
+        
+        // Get complaint statistics
+        $totalComplaints = $baseQuery->count();
+        $openComplaints = (clone $baseQuery)->where('status', 'open')->count();
+        $inProgressComplaints = (clone $baseQuery)->where('status', 'in_progress')->count();
+        $resolvedComplaints = (clone $baseQuery)->where('status', 'resolved')->count();
+        $closedComplaints = (clone $baseQuery)->where('status', 'closed')->count();
+        
+        // Get severity statistics
+        $lowSeverityComplaints = (clone $baseQuery)->where('severity', 'low')->count();
+        $mediumSeverityComplaints = (clone $baseQuery)->where('severity', 'medium')->count();
+        $highSeverityComplaints = (clone $baseQuery)->where('severity', 'high')->count();
+        $criticalSeverityComplaints = (clone $baseQuery)->where('severity', 'critical')->count();
+        
+        // Get recent complaints
+        $recentComplaints = (clone $baseQuery)->with(['user', 'resolver', 'shift'])
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+        
+        return view('admin.complaints.dashboard', compact(
+            'totalComplaints',
+            'openComplaints',
+            'inProgressComplaints',
+            'resolvedComplaints',
+            'closedComplaints',
+            'lowSeverityComplaints',
+            'mediumSeverityComplaints',
+            'highSeverityComplaints',
+            'criticalSeverityComplaints',
+            'recentComplaints'
+        ));
     }
 
     /**

@@ -123,6 +123,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Complaint routes
     Route::resource('complaints', ComplaintController::class);
     Route::get('/shifts/{shift}/complaint/create', [ComplaintController::class, 'createFromShift'])->name('complaints.create-from-shift');
+    Route::post('/shifts/{shift}/complaint/quick-submit', [ComplaintController::class, 'quickSubmit'])->name('complaints.quick-submit');
     
     // Training & Courses
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
@@ -169,13 +170,16 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\AdminMiddleware::cla
         ->name('courses.enrollments');
     
     // Timesheet Management
+    Route::get('timesheets-dashboard', [Admin\TimesheetController::class, 'dashboard'])->name('timesheets.dashboard');
     Route::resource('timesheets', Admin\TimesheetController::class);
     Route::post('timesheets/{timesheet}/approve', [Admin\TimesheetController::class, 'approve'])->name('timesheets.approve');
     Route::post('timesheets/{timesheet}/reject', [Admin\TimesheetController::class, 'reject'])->name('timesheets.reject');
     Route::get('/timesheets-export', [Admin\TimesheetExportController::class, 'index'])->name('timesheets.export');
     Route::post('/timesheets-export/download', [Admin\TimesheetExportController::class, 'export'])->name('timesheets.export.download');
+    Route::get('/timesheets-export/{format}', [Admin\TimesheetExportController::class, 'export'])->name('timesheets.export.format');
     
     // Complaint Management
+    Route::get('complaints-dashboard', [Admin\ComplaintController::class, 'dashboard'])->name('complaints.dashboard');
     Route::resource('complaints', Admin\ComplaintController::class);
     Route::post('/complaints/{complaint}/in-progress', [Admin\ComplaintController::class, 'markInProgress'])->name('complaints.in-progress');
     Route::post('/complaints/{complaint}/resolve', [Admin\ComplaintController::class, 'resolve'])->name('complaints.resolve');

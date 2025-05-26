@@ -117,4 +117,30 @@ class ComplaintController extends Controller
         return redirect()->route('complaints.index')
             ->with('success', 'Complaint deleted successfully.');
     }
+
+    /**
+     * Quick submit a complaint from the shift checkout page.
+     */
+    public function quickSubmit(Request $request, Shift $shift)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'severity' => 'required|in:low,medium,high,critical',
+        ]);
+
+        $complaint = new Complaint([
+            'user_id' => Auth::id(),
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'severity' => $validated['severity'],
+            'status' => 'open',
+            'shift_id' => $shift->id,
+        ]);
+
+        $complaint->save();
+
+        return redirect()->route('shifts.my')
+            ->with('success', 'Your complaint has been submitted successfully. Thank you for your feedback.');
+    }
 }
