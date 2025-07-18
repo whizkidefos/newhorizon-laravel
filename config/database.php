@@ -112,6 +112,23 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'wordpress' => [
+            'driver' => 'mysql',
+            'url' => env('WP_DB_URL'),
+            'host' => env('WP_DB_HOST', '127.0.0.1'),
+            'port' => env('WP_DB_PORT', '3306'),
+            'database' => env('WP_DB_DATABASE', 'wordpress'),
+            'username' => env('WP_DB_USERNAME', 'root'),
+            'password' => env('WP_DB_PASSWORD', ''),
+            'unix_socket' => env('WP_DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => env('WP_DB_PREFIX', 'wp_'),
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+        ],
+
     ],
 
     /*
