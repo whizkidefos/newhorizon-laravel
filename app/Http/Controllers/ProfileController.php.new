@@ -35,8 +35,6 @@ class ProfileController extends Controller
         try {
             DB::beginTransaction();
             
-            Log::info('Profile update started', ['user_id' => auth()->id()]);
-            
             $user = auth()->user();
             $validated = $request->validated();
 
@@ -118,47 +116,18 @@ class ProfileController extends Controller
             $user->update($validated);
             
             // Update profile details if they exist in the request
-            $profileDetailData = [];
-            
-            // Map form field names to ProfileDetail model field names
-            if (isset($validated['address_line1'])) {
-                $profileDetailData['address_line_1'] = $validated['address_line1'];
-            }
-            if (isset($validated['address_line2'])) {
-                $profileDetailData['address_line_2'] = $validated['address_line2'];
-            }
-            if (isset($validated['city'])) {
-                $profileDetailData['city'] = $validated['city'];
-            }
-            if (isset($validated['county'])) {
-                $profileDetailData['county'] = $validated['county'];
-            }
-            if (isset($validated['postcode'])) {
-                $profileDetailData['postcode'] = $validated['postcode'];
-            }
-            
-            if (!empty($profileDetailData)) {
-                // Log the profile detail data for debugging
-                Log::info('Profile detail data for update:', $profileDetailData);
-                
+            if (isset($validated['address_line1']) || isset($validated['city']) || isset($validated['postcode'])) {
                 $user->profileDetail()->updateOrCreate(
                     ['user_id' => $user->id],
-                    $profileDetailData
+                    array_intersect_key($validated, array_flip([
+                        'address_line1', 'address_line2', 'city', 'county', 'postcode'
+                    ]))
                 );
             }
             
             DB::commit();
 
             Log::info('Profile updated successfully for user:', ['id' => $user->id]);
-            
-            // Reload the user with fresh data including relationships
-            $user = $user->fresh(['profileDetail']);
-            
-            // Log the final user data for debugging
-            Log::info('Final user data after update:', [
-                'user' => $user->only(['id', 'first_name', 'last_name', 'email', 'profile_photo']),
-                'profile_detail' => $user->profileDetail ? $user->profileDetail->toArray() : null
-            ]);
 
             // Redirect to profile index page with success message
             return redirect()->route('profile.index')

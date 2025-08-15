@@ -45,8 +45,8 @@ class UpdateProfileRequest extends FormRequest
             'signature' => ['nullable', 'image', 'max:2048'], // 2MB max
             
             // Address fields (optional)
-            'address_line_1' => ['nullable', 'string', 'max:255'],
-            'address_line_2' => ['nullable', 'string', 'max:255'],
+            'address_line1' => ['nullable', 'string', 'max:255'],
+            'address_line2' => ['nullable', 'string', 'max:255'],
             'city' => ['nullable', 'string', 'max:255'],
             'county' => ['nullable', 'string', 'max:255'],
             'postcode' => ['nullable', 'string', 'max:10'],

@@ -119,6 +119,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Timesheet routes
     Route::resource('timesheets', TimesheetController::class);
     Route::get('/shifts/{shift}/timesheet/create', [TimesheetController::class, 'createFromShift'])->name('timesheets.create-from-shift');
+    Route::get('/timesheets/quick-submit', [TimesheetController::class, 'quickSubmit'])->name('timesheets.quick-submit');
+    Route::get('/shifts/{shift}/timesheet', [ShiftController::class, 'createTimesheet'])->name('shifts.timesheet');
+    Route::post('/shifts/{shift}/timesheet/quick-submit', [TimesheetController::class, 'quickSubmitFromShift'])->name('timesheets.quick-submit-from-shift');
     
     // Complaint routes
     Route::resource('complaints', ComplaintController::class);

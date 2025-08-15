@@ -44,12 +44,12 @@
                                 <p class="mt-1 text-gray-600 dark:text-gray-400">Phone: {{ Auth::user()->mobile_number ?? 'Not provided' }}</p>
                                 <p class="text-gray-600 dark:text-gray-400">
                                     Address: 
-                                    @if(Auth::user()->address_line_1)
-                                        {{ Auth::user()->address_line_1 }}
-                                        @if(Auth::user()->address_line_2), {{ Auth::user()->address_line_2 }}@endif
-                                        @if(Auth::user()->city), {{ Auth::user()->city }}@endif
-                                        @if(Auth::user()->county), {{ Auth::user()->county }}@endif
-                                        @if(Auth::user()->postcode), {{ Auth::user()->postcode }}@endif
+                                    @if(Auth::user()->profileDetail && Auth::user()->profileDetail->address_line_1)
+                                        {{ Auth::user()->profileDetail->address_line_1 }}
+                                        @if(Auth::user()->profileDetail->address_line_2), {{ Auth::user()->profileDetail->address_line_2 }}@endif
+                                        @if(Auth::user()->profileDetail->city), {{ Auth::user()->profileDetail->city }}@endif
+                                        @if(Auth::user()->profileDetail->county), {{ Auth::user()->profileDetail->county }}@endif
+                                        @if(Auth::user()->profileDetail->postcode), {{ Auth::user()->profileDetail->postcode }}@endif
                                     @else
                                         Not provided
                                     @endif
@@ -89,6 +89,108 @@
                                 <p class="mt-1 text-gray-600 dark:text-gray-400">Job Role: {{ Auth::user()->job_role ?? 'Not specified' }}</p>
                                 <p class="text-gray-600 dark:text-gray-400">NI Number: {{ Auth::user()->national_insurance_number ?? 'Not provided' }}</p>
                                 <p class="text-gray-600 dark:text-gray-400">Nationality: {{ Auth::user()->nationality ?? 'Not specified' }}</p>
+                                
+                                <div class="mt-3">
+                                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Documents Status</h4>
+                                    <div class="mt-2 space-y-2">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0">
+                                                @if(Auth::user()->profile_photo)
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">Profile Photo</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0">
+                                                @if(Auth::user()->signature)
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">Signature</p>
+                                                @if(Auth::user()->signature_date)
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400">Uploaded: {{ Auth::user()->signature_date->format('d M Y') }}</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        
+                                        @if(Auth::user()->has_enhanced_dbs)
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0">
+                                                @if(Auth::user()->dbs_certificate)
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">DBS Certificate</p>
+                                                @if(!Auth::user()->dbs_certificate)
+                                                    <p class="text-xs text-yellow-600 dark:text-yellow-400">Required for enhanced DBS</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endif
+                                        
+                                        @if(Auth::user()->nationality && Auth::user()->nationality !== 'British')
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0">
+                                                @if(Auth::user()->brp_document)
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-800 dark:text-yellow-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">BRP Document</p>
+                                                @if(!Auth::user()->brp_document)
+                                                    <p class="text-xs text-yellow-600 dark:text-yellow-400">Required for non-British nationals</p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -343,13 +343,84 @@ class ComplaintController extends Controller
         if ($request->has('end_date') && $request->end_date) {
             $query->whereDate('created_at', '<=', $request->end_date);
         }
+        
+        // Additional filters for enhanced export
+        if ($request->has('location') && $request->location) {
+            $query->whereHas('shift', function($query) use ($request) {
+                $query->where('location', $request->location);
+            });
+        }
+        
+        if ($request->has('department') && $request->department) {
+            $query->whereHas('user', function($query) use ($request) {
+                $query->where('department', $request->department);
+            });
+        }
+        
+        // Sort options
+        $sortField = $request->input('sort_field', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        
+        // Validate sort field to prevent SQL injection
+        $allowedSortFields = ['created_at', 'severity', 'status', 'resolved_at'];
+        if (!in_array($sortField, $allowedSortFields)) {
+            $sortField = 'created_at';
+        }
+        
+        $query->orderBy($sortField, $sortDirection === 'asc' ? 'asc' : 'desc');
 
         $complaints = $query->get();
         
-        // Create CSV
+        // Add filename customization
+        $filename = 'complaints';
+        if ($request->has('filename') && $request->filename) {
+            $filename = preg_replace('/[^a-z0-9_-]/i', '_', $request->filename);
+        } else {
+            // Generate a descriptive filename based on filters
+            if ($request->has('start_date') && $request->has('end_date')) {
+                $filename .= '_' . $request->start_date . '_to_' . $request->end_date;
+            } elseif ($request->has('date')) {
+                $filename .= '_' . $request->date;
+            }
+            
+            if ($request->has('status')) {
+                $filename .= '_' . $request->status;
+            }
+            
+            if ($request->has('severity')) {
+                $filename .= '_' . $request->severity;
+            }
+        }
+        
+        // Determine export format
+        $format = $request->format ?? 'csv';
+        
+        switch ($format) {
+            case 'csv':
+                return $this->exportCsv($complaints, $filename);
+            case 'json':
+                return $this->exportJson($complaints, $filename);
+            case 'excel':
+                return $this->exportExcel($complaints, $filename);
+            case 'pdf':
+                return $this->exportPdf($complaints, $filename);
+            default:
+                return $this->exportCsv($complaints, $filename);
+        }
+    }
+    
+    /**
+     * Export complaints as CSV.
+     * 
+     * @param \Illuminate\Database\Eloquent\Collection $complaints
+     * @param string $filename Base filename without extension
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    private function exportCsv($complaints, $filename = 'complaints')
+    {
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="complaints.csv"',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '.csv"',
         ];
 
         $callback = function() use ($complaints) {
@@ -358,21 +429,24 @@ class ComplaintController extends Controller
             // Add headers
             fputcsv($file, [
                 'ID', 'Employee', 'Title', 'Description', 'Severity', 
-                'Status', 'Resolution Notes', 'Resolved By', 'Resolved At', 'Submitted At'
+                'Status', 'Resolution Notes', 'Resolved By', 'Resolved At', 
+                'Location', 'Department', 'Submitted At'
             ]);
             
             // Add data
             foreach ($complaints as $complaint) {
                 fputcsv($file, [
                     $complaint->id,
-                    $complaint->user->full_name,
+                    $complaint->user->name ?? 'Unknown',
                     $complaint->title,
                     $complaint->description,
                     $complaint->severity,
                     $complaint->status,
                     $complaint->resolution_notes,
-                    $complaint->resolver ? $complaint->resolver->full_name : '',
+                    $complaint->resolver ? $complaint->resolver->name : '',
                     $complaint->resolved_at ? $complaint->resolved_at->format('Y-m-d H:i:s') : '',
+                    $complaint->shift ? $complaint->shift->location : 'N/A',
+                    $complaint->user->department ?? 'N/A',
                     $complaint->created_at->format('Y-m-d H:i:s')
                 ]);
             }
@@ -381,5 +455,166 @@ class ComplaintController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+    
+    /**
+     * Export complaints as JSON.
+     * 
+     * @param \Illuminate\Database\Eloquent\Collection $complaints
+     * @param string $filename Base filename without extension
+     * @return \Illuminate\Http\Response
+     */
+    private function exportJson($complaints, $filename = 'complaints')
+    {
+        $data = $complaints->map(function ($complaint) {
+            return [
+                'id' => $complaint->id,
+                'employee' => [
+                    'id' => $complaint->user->id,
+                    'name' => $complaint->user->name,
+                    'email' => $complaint->user->email,
+                    'department' => $complaint->user->department,
+                ],
+                'title' => $complaint->title,
+                'description' => $complaint->description,
+                'severity' => $complaint->severity,
+                'status' => $complaint->status,
+                'resolution_notes' => $complaint->resolution_notes,
+                'resolver' => $complaint->resolver ? [
+                    'id' => $complaint->resolver->id,
+                    'name' => $complaint->resolver->name,
+                ] : null,
+                'shift' => $complaint->shift ? [
+                    'id' => $complaint->shift->id,
+                    'location' => $complaint->shift->location,
+                ] : null,
+                'resolved_at' => $complaint->resolved_at ? $complaint->resolved_at->format('Y-m-d H:i:s') : null,
+                'created_at' => $complaint->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $complaint->updated_at->format('Y-m-d H:i:s'),
+            ];
+        });
+        
+        return response()->json([
+            'count' => $complaints->count(),
+            'data' => $data,
+        ])->header('Content-Disposition', 'attachment; filename="' . $filename . '.json"');
+    }
+    
+    /**
+     * Export complaints as Excel.
+     * Note: This requires the maatwebsite/excel package to be installed.
+     * 
+     * @param \Illuminate\Database\Eloquent\Collection $complaints
+     * @param string $filename Base filename without extension
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    private function exportExcel($complaints, $filename = 'complaints')
+    {
+        // Check if Laravel Excel package is installed
+        if (class_exists('\Maatwebsite\Excel\Facades\Excel')) {
+            // Implementation would use Laravel Excel package
+            // This is a placeholder for the actual implementation
+            
+            // For now, fallback to CSV with a message
+            return response()->streamDownload(function() use ($complaints) {
+                echo "Excel export requires the maatwebsite/excel package.\n";
+                echo "Please install it using: composer require maatwebsite/excel\n";
+                echo "\nFalling back to CSV format:\n\n";
+                
+                $file = fopen('php://output', 'w');
+                
+                // Add headers
+                fputcsv($file, [
+                    'ID', 'Employee', 'Title', 'Description', 'Severity', 
+                    'Status', 'Resolution Notes', 'Resolved By', 'Resolved At', 
+                    'Location', 'Department', 'Submitted At'
+                ]);
+                
+                // Add data
+                foreach ($complaints as $complaint) {
+                    fputcsv($file, [
+                        $complaint->id,
+                        $complaint->user->name ?? 'Unknown',
+                        $complaint->title,
+                        $complaint->description,
+                        $complaint->severity,
+                        $complaint->status,
+                        $complaint->resolution_notes,
+                        $complaint->resolver ? $complaint->resolver->name : '',
+                        $complaint->resolved_at ? $complaint->resolved_at->format('Y-m-d H:i:s') : '',
+                        $complaint->shift ? $complaint->shift->location : 'N/A',
+                        $complaint->user->department ?? 'N/A',
+                        $complaint->created_at->format('Y-m-d H:i:s')
+                    ]);
+                }
+                
+                fclose($file);
+            }, $filename . '.csv', [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '.csv"',
+            ]);
+        }
+        
+        // Fallback to CSV
+        return $this->exportCsv($complaints, $filename);
+    }
+    
+    /**
+     * Export complaints as PDF.
+     * Note: This requires a PDF package like dompdf to be installed.
+     * 
+     * @param \Illuminate\Database\Eloquent\Collection $complaints
+     * @param string $filename Base filename without extension
+     * @return \Illuminate\Http\Response
+     */
+    private function exportPdf($complaints, $filename = 'complaints')
+    {
+        // Check if dompdf package is installed
+        if (class_exists('\Barryvdh\DomPDF\Facade\Pdf') || class_exists('\Barryvdh\DomPDF\PDF')) {
+            // Implementation would use dompdf package
+            // This is a placeholder for the actual implementation
+            
+            // For now, return a view that could be used with dompdf
+            return response()->streamDownload(function() use ($complaints) {
+                echo "PDF export requires the barryvdh/laravel-dompdf package.\n";
+                echo "Please install it using: composer require barryvdh/laravel-dompdf\n";
+                echo "\nFalling back to CSV format:\n\n";
+                
+                $file = fopen('php://output', 'w');
+                
+                // Add headers
+                fputcsv($file, [
+                    'ID', 'Employee', 'Title', 'Description', 'Severity', 
+                    'Status', 'Resolution Notes', 'Resolved By', 'Resolved At', 
+                    'Location', 'Department', 'Submitted At'
+                ]);
+                
+                // Add data
+                foreach ($complaints as $complaint) {
+                    fputcsv($file, [
+                        $complaint->id,
+                        $complaint->user->name ?? 'Unknown',
+                        $complaint->title,
+                        $complaint->description,
+                        $complaint->severity,
+                        $complaint->status,
+                        $complaint->resolution_notes,
+                        $complaint->resolver ? $complaint->resolver->name : '',
+                        $complaint->resolved_at ? $complaint->resolved_at->format('Y-m-d H:i:s') : '',
+                        $complaint->shift ? $complaint->shift->location : 'N/A',
+                        $complaint->user->department ?? 'N/A',
+                        $complaint->created_at->format('Y-m-d H:i:s')
+                    ]);
+                }
+                
+                fclose($file);
+            }, $filename . '.csv', [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '.csv"',
+            ]);
+        }
+        
+        // Fallback to CSV
+        return $this->exportCsv($complaints, $filename);
     }
 }

@@ -43,7 +43,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" x-data="{ nationality: '{{ old('nationality', $user->nationality) }}' }">
+                    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6" x-data="{ nationality: '{{ old('nationality', $user->nationality) }}' }">
                         @csrf
                         @method('PATCH')
 
@@ -126,36 +126,36 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Address Line 1 -->
                                 <div class="md:col-span-2">
-                                    <x-input-label for="address_line_1" :value="__('Address Line 1')" />
-                                    <x-text-input id="address_line_1" name="address_line_1" type="text" class="mt-1 block w-full" :value="old('address_line_1', $user->address_line_1)" />
-                                    <x-input-error :messages="$errors->get('address_line_1')" class="mt-2" />
+                                    <x-input-label for="address_line1" :value="__('Address Line 1')" />
+                                    <x-text-input id="address_line1" name="address_line1" type="text" class="mt-1 block w-full" :value="old('address_line1', $user->profileDetail->address_line_1 ?? '')" />
+                                    <x-input-error :messages="$errors->get('address_line1')" class="mt-2" />
                                 </div>
 
                                 <!-- Address Line 2 -->
                                 <div class="md:col-span-2">
-                                    <x-input-label for="address_line_2" :value="__('Address Line 2')" />
-                                    <x-text-input id="address_line_2" name="address_line_2" type="text" class="mt-1 block w-full" :value="old('address_line_2', $user->address_line_2)" />
-                                    <x-input-error :messages="$errors->get('address_line_2')" class="mt-2" />
+                                    <x-input-label for="address_line2" :value="__('Address Line 2')" />
+                                    <x-text-input id="address_line2" name="address_line2" type="text" class="mt-1 block w-full" :value="old('address_line2', $user->profileDetail->address_line_2 ?? '')" />
+                                    <x-input-error :messages="$errors->get('address_line2')" class="mt-2" />
                                 </div>
 
                                 <!-- City -->
                                 <div>
                                     <x-input-label for="city" :value="__('City')" />
-                                    <x-text-input id="city" name="city" type="text" class="mt-1 block w-full" :value="old('city', $user->city)" />
+                                    <x-text-input id="city" name="city" type="text" class="mt-1 block w-full" :value="old('city', $user->profileDetail->city ?? '')" />
                                     <x-input-error :messages="$errors->get('city')" class="mt-2" />
                                 </div>
 
                                 <!-- County -->
                                 <div>
                                     <x-input-label for="county" :value="__('County')" />
-                                    <x-text-input id="county" name="county" type="text" class="mt-1 block w-full" :value="old('county', $user->county)" />
+                                    <x-text-input id="county" name="county" type="text" class="mt-1 block w-full" :value="old('county', $user->profileDetail->county ?? '')" />
                                     <x-input-error :messages="$errors->get('county')" class="mt-2" />
                                 </div>
 
                                 <!-- Postcode -->
                                 <div>
                                     <x-input-label for="postcode" :value="__('Postcode')" />
-                                    <x-text-input id="postcode" name="postcode" type="text" class="mt-1 block w-full" :value="old('postcode', $user->postcode)" />
+                                    <x-text-input id="postcode" name="postcode" type="text" class="mt-1 block w-full" :value="old('postcode', $user->profileDetail->postcode ?? '')" />
                                     <x-input-error :messages="$errors->get('postcode')" class="mt-2" />
                                 </div>
                             </div>
@@ -259,28 +259,70 @@
                                 <!-- Profile Photo -->
                                 <div>
                                     <x-input-label for="profile_photo" :value="__('Profile Photo')" />
-                                    <input id="profile_photo" name="profile_photo" type="file" accept="image/*" class="mt-1 block w-full" />
+                                    @if($user->profile_photo)
+                                        <div class="mt-2 mb-3">
+                                            <img src="{{ asset('storage/' . $user->profile_photo) }}" alt="Current profile photo" class="h-20 w-20 rounded-full object-cover border border-gray-200 dark:border-gray-700">
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Current profile photo</p>
+                                        </div>
+                                    @endif
+                                    <input id="profile_photo" name="profile_photo" type="file" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200" />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Recommended: Square image, max 2MB</p>
                                     <x-input-error :messages="$errors->get('profile_photo')" class="mt-2" />
                                 </div>
 
                                 <!-- DBS Certificate -->
                                 <div>
                                     <x-input-label for="dbs_certificate" :value="__('DBS Certificate')" />
-                                    <input id="dbs_certificate" name="dbs_certificate" type="file" accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full" />
+                                    @if($user->dbs_certificate)
+                                        <div class="mt-2 mb-3 flex items-center">
+                                            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-50 dark:bg-gray-700">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Document uploaded</p>
+                                                <a href="{{ asset('storage/' . $user->dbs_certificate) }}" target="_blank" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">View current document</a>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <input id="dbs_certificate" name="dbs_certificate" type="file" accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200" />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Accepted formats: PDF, JPG, PNG (max 5MB)</p>
                                     <x-input-error :messages="$errors->get('dbs_certificate')" class="mt-2" />
                                 </div>
 
                                 <!-- BRP Document -->
                                 <div x-show="nationality && nationality !== 'British'">
                                     <x-input-label for="brp_document" :value="__('BRP Document')" />
-                                    <input id="brp_document" name="brp_document" type="file" accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full" />
+                                    @if($user->brp_document)
+                                        <div class="mt-2 mb-3 flex items-center">
+                                            <div class="flex items-center justify-center h-12 w-12 rounded-md bg-blue-50 dark:bg-gray-700">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">BRP Document uploaded</p>
+                                                <a href="{{ asset('storage/' . $user->brp_document) }}" target="_blank" class="text-xs text-blue-600 dark:text-blue-400 hover:underline">View current document</a>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <input id="brp_document" name="brp_document" type="file" accept=".pdf,.jpg,.jpeg,.png" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200" />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Accepted formats: PDF, JPG, PNG (max 5MB)</p>
                                     <x-input-error :messages="$errors->get('brp_document')" class="mt-2" />
                                 </div>
 
                                 <!-- Signature -->
                                 <div>
                                     <x-input-label for="signature" :value="__('Signature')" />
-                                    <input id="signature" name="signature" type="file" accept="image/*" class="mt-1 block w-full" />
+                                    @if($user->signature)
+                                        <div class="mt-2 mb-3">
+                                            <img src="{{ asset('storage/' . $user->signature) }}" alt="Current signature" class="h-16 max-w-xs border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2">
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Current signature (uploaded: {{ $user->signature_date ? $user->signature_date->format('d M Y') : 'N/A' }})</p>
+                                        </div>
+                                    @endif
+                                    <input id="signature" name="signature" type="file" accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-gray-200" />
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload a clear image of your signature (max 2MB)</p>
                                     <x-input-error :messages="$errors->get('signature')" class="mt-2" />
                                 </div>
                             </div>
