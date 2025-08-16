@@ -14,12 +14,16 @@ class ProfileController extends Controller
     public function index()
     {
         $user = auth()->user();
+        
+        // Ensure we have fresh data after updates
+        $user->refresh();
+        
         return view('profile.index', [
             'user' => $user,
-            'bankDetails' => $user->bankDetails,
+            'bankDetails' => $user->bankDetail,
             'workHistory' => $user->workHistory()->latest()->get(),
             'trainingRecords' => $user->trainingRecords()->latest()->get(),
-            'profileDetails' => $user->profileDetails
+            'profileDetails' => $user->profileDetail
         ]);
     }
 
@@ -114,8 +118,13 @@ class ProfileController extends Controller
             $validated['right_to_work_uk'] = $request->boolean('right_to_work_uk');
             $validated['has_criminal_convictions'] = $request->boolean('has_criminal_convictions');
 
-            // Update user profile with all fields
-            $user->update($validated);
+            // Remove address fields from user update as they should only be in ProfileDetail
+            $userUpdateData = array_diff_key($validated, array_flip([
+                'address_line1', 'address_line2', 'city', 'county', 'postcode'
+            ]));
+            
+            // Update user profile with non-address fields
+            $user->update($userUpdateData);
             
             // Update profile details if they exist in the request
             $profileDetailData = [];
@@ -137,14 +146,25 @@ class ProfileController extends Controller
                 $profileDetailData['postcode'] = $validated['postcode'];
             }
             
+            // Set default country if not provided
+            $profileDetailData['country'] = $validated['country'] ?? 'United Kingdom';
+            
             if (!empty($profileDetailData)) {
                 // Log the profile detail data for debugging
                 Log::info('Profile detail data for update:', $profileDetailData);
                 
-                $user->profileDetail()->updateOrCreate(
-                    ['user_id' => $user->id],
-                    $profileDetailData
-                );
+                // Force update by retrieving the profile detail first
+                $profileDetail = $user->profileDetail;
+                
+                if ($profileDetail) {
+                    // Update existing profile detail
+                    $profileDetail->update($profileDetailData);
+                    Log::info('Updated existing profile detail', ['user_id' => $user->id]);
+                } else {
+                    // Create new profile detail
+                    $user->profileDetail()->create($profileDetailData);
+                    Log::info('Created new profile detail', ['user_id' => $user->id]);
+                }
             }
             
             DB::commit();
@@ -160,9 +180,14 @@ class ProfileController extends Controller
                 'profile_detail' => $user->profileDetail ? $user->profileDetail->toArray() : null
             ]);
 
-            // Redirect to profile index page with success message
+            // Redirect to profile index page with success message and toast notification
             return redirect()->route('profile.index')
-                ->with('success', 'Your profile has been updated successfully.');
+                ->with('success', 'Your profile has been updated successfully.')
+                ->with('toast', [
+                    'type' => 'success',
+                    'message' => 'Profile updated successfully!',
+                    'position' => 'top-right'
+                ]);
 
         } catch (\Exception $e) {
             DB::rollBack();

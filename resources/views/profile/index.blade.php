@@ -16,9 +16,17 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="flex items-center justify-between mb-6">
                         <h1 class="text-2xl font-semibold">Profile Information</h1>
-                        <a href="{{ route('profile.edit') }}" class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">
-                            Edit Profile
-                        </a>
+                        <div class="flex space-x-2">
+                            <a href="{{ route('profile.export') }}" class="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" />
+                                </svg>
+                                Export Profile
+                            </a>
+                            <a href="{{ route('profile.edit') }}" class="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600">
+                                Edit Profile
+                            </a>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -50,6 +58,7 @@
                                         @if(Auth::user()->profileDetail->city), {{ Auth::user()->profileDetail->city }}@endif
                                         @if(Auth::user()->profileDetail->county), {{ Auth::user()->profileDetail->county }}@endif
                                         @if(Auth::user()->profileDetail->postcode), {{ Auth::user()->profileDetail->postcode }}@endif
+                                        @if(Auth::user()->profileDetail->country), {{ Auth::user()->profileDetail->country }}@endif
                                     @else
                                         Not provided
                                     @endif
@@ -86,7 +95,7 @@
 
                             <div>
                                 <h3 class="text-lg font-medium">Professional Details</h3>
-                                <p class="mt-1 text-gray-600 dark:text-gray-400">Job Role: {{ Auth::user()->job_role ?? 'Not specified' }}</p>
+                                <p class="mt-1 text-gray-600 dark:text-gray-400">Job Role: {{ ucwords(str_replace('_', ' ', Auth::user()->job_role)) ?? 'Not specified' }}</p>
                                 <p class="text-gray-600 dark:text-gray-400">NI Number: {{ Auth::user()->national_insurance_number ?? 'Not provided' }}</p>
                                 <p class="text-gray-600 dark:text-gray-400">Nationality: {{ Auth::user()->nationality ?? 'Not specified' }}</p>
                                 
@@ -209,6 +218,11 @@
                         <a href="{{ route('profile.trainings') }}" class="p-6 transition-colors bg-white border rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600">
                             <h3 class="text-lg font-semibold">Training Records</h3>
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Access your training certificates and records</p>
+                        </a>
+
+                        <a href="{{ route('profile.export') }}" class="p-6 transition-colors bg-white border rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600">
+                            <h3 class="text-lg font-semibold">Export Profile</h3>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Download your profile data in various formats</p>
                         </a>
                     </div>
                 </div>

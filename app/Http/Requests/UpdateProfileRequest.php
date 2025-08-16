@@ -50,6 +50,7 @@ class UpdateProfileRequest extends FormRequest
             'city' => ['nullable', 'string', 'max:255'],
             'county' => ['nullable', 'string', 'max:255'],
             'postcode' => ['nullable', 'string', 'max:10'],
+            'country' => ['nullable', 'string', 'max:255'],
             
             // Employment details fields
             'employee_id' => ['nullable', 'string', 'max:255'],

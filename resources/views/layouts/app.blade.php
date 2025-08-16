@@ -54,7 +54,9 @@
         @endif
 
         <!-- Toast Notifications -->
-        @if (session('success'))
+        @if (session('toast'))
+            <x-toast type="{{ session('toast.type') }}" message="{{ session('toast.message') }}" />
+        @elseif (session('success'))
             <x-toast type="success" :message="session('success')" />
         @endif
 

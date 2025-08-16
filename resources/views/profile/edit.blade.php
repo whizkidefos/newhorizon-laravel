@@ -158,6 +158,13 @@
                                     <x-text-input id="postcode" name="postcode" type="text" class="mt-1 block w-full" :value="old('postcode', $user->profileDetail->postcode ?? '')" />
                                     <x-input-error :messages="$errors->get('postcode')" class="mt-2" />
                                 </div>
+                                
+                                <!-- Country -->
+                                <div>
+                                    <x-input-label for="country" :value="__('Country')" />
+                                    <x-text-input id="country" name="country" type="text" class="mt-1 block w-full" :value="old('country', $user->profileDetail->country ?? 'United Kingdom')" />
+                                    <x-input-error :messages="$errors->get('country')" class="mt-2" />
+                                </div>
                             </div>
                         </div>
 
