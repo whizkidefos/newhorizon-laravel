@@ -5,26 +5,27 @@
 
 @section('content')
     <!-- Hero Section -->
-    <div class="relative min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 overflow-hidden">
+    <div class="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 overflow-hidden py-16 md:py-24">
         <!-- Background Pattern -->
         <div class="absolute inset-0 bg-grid-white/[0.05] bg-[size:60px_60px]"></div>
         <!-- Gradient Overlay -->
         <div class="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent"></div>
         
         <!-- Animated Circles -->
-        <div class="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div class="absolute bottom-0 left-1/2 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div class="absolute top-0 left-0 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute top-0 right-0 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-0 left-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
         <div class="max-w-7xl mx-auto relative">
-            <div class="relative z-10 pt-14 lg:pt-20">
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-20 lg:pb-48">
-                    <div class="text-center lg:text-left lg:grid lg:grid-cols-2 lg:gap-8 items-center">
-                        <div>
-                            <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl lg:text-7xl">
+            <div class="relative z-10">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+                        <!-- Text Content -->
+                        <div class="text-center lg:text-left lg:w-1/2">
+                            <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
                                 <span class="block mb-2">Transforming</span>
                                 <span class="block text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">Healthcare</span>
-                                <span class="block text-2xl sm:text-3xl md:text-4xl mt-4 text-blue-200">
+                                <span class="block text-2xl sm:text-3xl mt-4 text-blue-200">
                                     Through
                                     <span class="inline-flex flex-col h-[1.25em] overflow-hidden">
                                         <span class="animate-text-slide text-center">
@@ -37,21 +38,21 @@
                                     </span>
                                 </span>
                             </h1>
-                            <p class="mt-6 text-lg sm:text-xl text-blue-100 max-w-2xl mx-auto lg:mx-0">
+                            <p class="mt-6 text-lg text-blue-100 max-w-xl mx-auto lg:mx-0">
                                 Empowering healthcare facilities with exceptional talent and transformative staffing solutions across North Wales and North West England.
                             </p>
                             
                             <!-- CTAs -->
-                            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                                 <a href="{{ route('jobs.index') }}" 
-                                   class="inline-flex items-center px-8 py-4 border-2 border-transparent text-base font-medium rounded-lg text-blue-900 bg-white hover:bg-blue-50 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+                                   class="inline-flex items-center px-6 py-3 border-2 border-transparent text-base font-medium rounded-lg text-blue-900 bg-white hover:bg-blue-50 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
                                     <span>Find Your Next Role</span>
                                     <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                     </svg>
                                 </a>
                                 <a href="{{ route('contact') }}" 
-                                   class="inline-flex items-center px-8 py-4 border-2 border-white text-base font-medium rounded-lg text-white hover:bg-white/10 transform hover:scale-105 transition-all duration-200">
+                                   class="inline-flex items-center px-6 py-3 border-2 border-white text-base font-medium rounded-lg text-white hover:bg-white/10 transform hover:scale-105 transition-all duration-200">
                                     <span>Contact Us</span>
                                     <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -61,12 +62,12 @@
                         </div>
                         
                         <!-- Hero Image/Illustration -->
-                        <div class="hidden lg:block relative mt-12 lg:mt-0">
+                        <div class="hidden lg:block lg:w-1/2">
                             <div class="relative mx-auto w-full max-w-md">
                                 <div class="relative">
                                     <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
                                          alt="Healthcare Professional" 
-                                         class="relative rounded-2xl shadow-2xl w-full h-[600px] object-cover object-center"
+                                         class="relative rounded-2xl shadow-2xl w-full h-[450px] object-cover object-center"
                                     >
                                     <div class="absolute inset-0 rounded-2xl bg-gradient-to-t from-blue-900/50 to-transparent"></div>
                                 </div>
@@ -226,103 +227,38 @@
                 <h2 class="text-3xl font-extrabold text-white sm:text-4xl">Our Impact in Numbers</h2>
                 <p class="mt-4 text-xl text-blue-100">Making a difference in healthcare staffing across North Wales and North West England</p>
             </div>
-            <div class="grid grid-cols-2 gap-12 md:grid-cols-4">
-                <div class="text-center transform hover:scale-105 transition-all duration-300 bg-white/10 rounded-lg p-6 backdrop-blur-sm" 
-                     x-data="{ shown: false, count: 0 }" 
-                     x-intersect="shown = true"
-                     x-init="$watch('shown', value => {
-                        if (value) {
-                            let start = 0;
-                            const end = 500;
-                            const duration = 2000;
-                            const step = end / (duration / 16);
-                            const counter = setInterval(() => {
-                                count = Math.ceil(start);
-                                start += step;
-                                if (start > end) {
-                                    count = end;
-                                    clearInterval(counter);
-                                }
-                            }, 16);
-                        }
-                    })">
+            <div class="grid grid-cols-2 gap-8 md:gap-12 md:grid-cols-4">
+                <!-- Healthcare Professionals Counter -->
+                <div class="text-center transform hover:scale-105 transition-all duration-300 bg-white/10 rounded-lg p-6 backdrop-blur-sm">
                     <div class="text-5xl font-extrabold text-white mb-2">
-                        <span x-text="count + '+'" class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">0+</span>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">500+</span>
                     </div>
                     <div class="text-lg text-blue-100">Healthcare Professionals</div>
                     <div class="mt-2 text-sm text-blue-200">Placed in the last year</div>
                 </div>
-                <div class="text-center transform hover:scale-105 transition-all duration-300 bg-white/10 rounded-lg p-6 backdrop-blur-sm" 
-                     x-data="{ shown: false, count: 0 }" 
-                     x-intersect="shown = true"
-                     x-init="$watch('shown', value => {
-                        if (value) {
-                            let start = 0;
-                            const end = 100;
-                            const duration = 2000;
-                            const step = end / (duration / 16);
-                            const counter = setInterval(() => {
-                                count = Math.ceil(start);
-                                start += step;
-                                if (start > end) {
-                                    count = end;
-                                    clearInterval(counter);
-                                }
-                            }, 16);
-                        }
-                    })">
+                
+                <!-- Partner Facilities Counter -->
+                <div class="text-center transform hover:scale-105 transition-all duration-300 bg-white/10 rounded-lg p-6 backdrop-blur-sm">
                     <div class="text-5xl font-extrabold text-white mb-2">
-                        <span x-text="count + '+'" class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">0+</span>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">100+</span>
                     </div>
                     <div class="text-lg text-blue-100">Partner Facilities</div>
                     <div class="mt-2 text-sm text-blue-200">Trusted partnerships</div>
                 </div>
-                <div class="text-center transform hover:scale-105 transition-all duration-300 bg-white/10 rounded-lg p-6 backdrop-blur-sm" 
-                     x-data="{ shown: false, count: 0 }" 
-                     x-intersect="shown = true"
-                     x-init="$watch('shown', value => {
-                        if (value) {
-                            let start = 0;
-                            const end = 15;
-                            const duration = 2000;
-                            const step = end / (duration / 16);
-                            const counter = setInterval(() => {
-                                count = Math.ceil(start);
-                                start += step;
-                                if (start > end) {
-                                    count = end;
-                                    clearInterval(counter);
-                                }
-                            }, 16);
-                        }
-                    })">
+                
+                <!-- Years Experience Counter -->
+                <div class="text-center transform hover:scale-105 transition-all duration-300 bg-white/10 rounded-lg p-6 backdrop-blur-sm">
                     <div class="text-5xl font-extrabold text-white mb-2">
-                        <span x-text="count + '+'" class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">0+</span>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">15+</span>
                     </div>
                     <div class="text-lg text-blue-100">Years Experience</div>
                     <div class="mt-2 text-sm text-blue-200">Industry expertise</div>
                 </div>
-                <div class="text-center transform hover:scale-105 transition-all duration-300 bg-white/10 rounded-lg p-6 backdrop-blur-sm" 
-                     x-data="{ shown: false, count: 0 }" 
-                     x-intersect="shown = true"
-                     x-init="$watch('shown', value => {
-                        if (value) {
-                            let start = 0;
-                            const end = 98;
-                            const duration = 2000;
-                            const step = end / (duration / 16);
-                            const counter = setInterval(() => {
-                                count = Math.ceil(start);
-                                start += step;
-                                if (start > end) {
-                                    count = end;
-                                    clearInterval(counter);
-                                }
-                            }, 16);
-                        }
-                    })">
+                
+                <!-- Client Satisfaction Counter -->
+                <div class="text-center transform hover:scale-105 transition-all duration-300 bg-white/10 rounded-lg p-6 backdrop-blur-sm">
                     <div class="text-5xl font-extrabold text-white mb-2">
-                        <span x-text="count + '%'" class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">0%</span>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-100 to-white">98%</span>
                     </div>
                     <div class="text-lg text-blue-100">Client Satisfaction</div>
                     <div class="mt-2 text-sm text-blue-200">Consistently rated</div>
