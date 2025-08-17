@@ -7,6 +7,7 @@ use App\Http\Controllers\Frontend\{
     ContactController
 };
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Admin\ContentManagementController;
 use App\Http\Controllers\Auth\{
     LoginController,
     RegisterController,
@@ -206,4 +207,22 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\AdminMiddleware::cla
     // Settings
     Route::get('/settings', [Admin\SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [Admin\SettingController::class, 'update'])->name('settings.update');
+    
+    // Content Management
+    Route::prefix('content')->name('content.')->group(function () {
+        Route::get('/', [ContentManagementController::class, 'index'])->name('index');
+        
+        // Logo Management
+        Route::get('/logo', [ContentManagementController::class, 'logoManagement'])->name('logo');
+        Route::post('/logo', [ContentManagementController::class, 'updateLogo'])->name('logo.update');
+        Route::post('/logo/upload', [ContentManagementController::class, 'saveUploadedLogo'])->name('logo.upload');
+        
+        // Favicon Management
+        Route::get('/favicon', [ContentManagementController::class, 'faviconManagement'])->name('favicon');
+        Route::post('/favicon', [ContentManagementController::class, 'updateFavicon'])->name('favicon.update');
+        
+        // Page Content Management
+        Route::get('/page-content', [ContentManagementController::class, 'pageContentManagement'])->name('page-content');
+        Route::post('/page-content', [ContentManagementController::class, 'updatePageContent'])->name('page-content.update');
+    });
 });

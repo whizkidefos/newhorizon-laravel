@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CourseSeeder::class,
             ShiftSeeder::class,
+            SiteSettingSeeder::class,
         ]);
     }
 }

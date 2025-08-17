@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form method="POST" action="{{ route('profile.export.download') }}" class="space-y-6">
+                    <form method="POST" action="{{ route('profile.export.download') }}" class="space-y-6" id="exportForm">
                         @csrf
 
                         <div>
@@ -48,6 +48,13 @@
                             <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="space-y-4">
                                     <h4 class="font-medium text-sm text-gray-700 dark:text-gray-300">{{ __('Personal Information') }}</h4>
+                                    
+                                    <div class="flex items-center">
+                                        <input id="field-profile_photo" name="columns[]" type="checkbox" value="profile_photo" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" checked>
+                                        <label for="field-profile_photo" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">
+                                            Profile Picture
+                                        </label>
+                                    </div>
                                     
                                     <div class="flex items-center">
                                         <input id="field-first_name" name="columns[]" type="checkbox" value="first_name" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" checked>
@@ -175,19 +182,57 @@
                                             Position
                                         </label>
                                     </div>
-                                    
-                                    <div class="flex items-center">
-                                        <input id="field-created_at" name="columns[]" type="checkbox" value="created_at" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                        <label for="field-created_at" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">
-                                            Account Created Date
-                                        </label>
-                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Other Information Section -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Other Information</h3>
+                            <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center">
+                                    <input id="field-created_at" name="columns[]" type="checkbox" value="created_at" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="field-created_at" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">
+                                        Account Created Date
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Work History Section -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Work History</h3>
+                            <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center">
+                                    <input id="field-work_history" name="columns[]" type="checkbox" value="work_history" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="field-work_history" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">
+                                        Include Work History
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Training Records Section -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Training Records</h3>
+                            <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="flex items-center">
+                                    <input id="field-training_records" name="columns[]" type="checkbox" value="training_records" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <label for="field-training_records" class="ml-3 block text-sm text-gray-700 dark:text-gray-300">
+                                        Include Training Records
+                                    </label>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-end mt-6">
-                            <x-primary-button>
+                        <div class="flex items-center justify-between mt-6">
+                            <a href="{{ route('profile.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-300 dark:bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-gray-800 dark:text-gray-300 uppercase tracking-widest hover:bg-gray-400 dark:hover:bg-gray-600 focus:bg-gray-400 dark:focus:bg-gray-600 active:bg-gray-500 dark:active:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                </svg>
+                                {{ __('Back to Profile') }}
+                            </a>
+                            <x-primary-button id="exportButton">
                                 {{ __('Export Profile') }}
                             </x-primary-button>
                         </div>
@@ -196,4 +241,30 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('exportForm');
+            const button = document.getElementById('exportButton');
+            let isSubmitting = false;
+            
+            form.addEventListener('submit', function(e) {
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                isSubmitting = true;
+                button.disabled = true;
+                button.classList.add('opacity-75', 'cursor-not-allowed');
+                
+                // Add a small timeout to ensure the form is submitted
+                setTimeout(() => {
+                    form.submit();
+                }, 10);
+            });
+        });
+    </script>
+    @endpush
 </x-app-layout>

@@ -133,6 +133,33 @@ class ProfileExportController extends Controller
             $data[$column] = $this->getColumnValue($user, $column);
         }
         
+        // Prepare additional data for PDF if needed
+        $workHistory = in_array('work_history', $columns) ? $user->workHistory()->orderBy('start_date', 'desc')->get() : null;
+        $trainingRecords = in_array('training_records', $columns) ? $user->trainingRecords()->orderBy('completion_date', 'desc')->get() : null;
+        
+        // Prepare profile image as base64 if available
+        $profileImageBase64 = null;
+        if ($user->profile_photo) {
+            $imagePath = storage_path('app/public/' . $user->profile_photo);
+            if (file_exists($imagePath)) {
+                // Use Intervention Image to fix orientation issues
+                try {
+                    // For Intervention Image v3
+                    $driver = new \Intervention\Image\Drivers\Gd\Driver();
+                    $imageManager = new \Intervention\Image\ImageManager($driver);
+                    $image = $imageManager->read($imagePath);
+                    // Fix orientation based on EXIF data
+                    $image = $image->autoOrientate();
+                    // Convert to data URL
+                    $profileImageBase64 = base64_encode($image->toJpeg(90)->toString());
+                } catch (\Exception $e) {
+                    // Fallback to direct file reading if Intervention Image fails
+                    $imageData = file_get_contents($imagePath);
+                    $profileImageBase64 = base64_encode($imageData);
+                }
+            }
+        }
+        
         // Generate PDF view
         $pdf = View::make('profile.pdf-export', [
             'user' => $user,
@@ -140,13 +167,17 @@ class ProfileExportController extends Controller
             'headers' => $headers,
             'columns' => $columns,
             'filename' => $filename,
-            'timestamp' => Carbon::now()->format('Y-m-d H:i:s')
+            'timestamp' => Carbon::now()->format('Y-m-d H:i:s'),
+            'workHistory' => $workHistory,
+            'trainingRecords' => $trainingRecords,
+            'profileImageBase64' => $profileImageBase64
         ]);
         
         // Create PDF
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isPhpEnabled', true);
+        $options->set('isRemoteEnabled', true); // Enable remote file access
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($pdf);
         $dompdf->setPaper('A4', 'portrait');
@@ -177,6 +208,7 @@ class ProfileExportController extends Controller
         $headers = [];
         $columnMap = [
             'id' => 'ID',
+            'profile_photo' => 'Profile Picture',
             'first_name' => 'First Name',
             'last_name' => 'Last Name',
             'email' => 'Email',
@@ -195,6 +227,8 @@ class ProfileExportController extends Controller
             'department' => 'Department',
             'position' => 'Position',
             'created_at' => 'Account Created',
+            'work_history' => 'Work History',
+            'training_records' => 'Training Records',
         ];
 
         foreach ($columns as $column) {
@@ -218,6 +252,8 @@ class ProfileExportController extends Controller
         switch ($column) {
             case 'id':
                 return $user->id;
+            case 'profile_photo':
+                return $user->profile_photo ? 'Available' : 'Not provided';
             case 'first_name':
                 return $user->first_name;
             case 'last_name':
@@ -265,6 +301,12 @@ class ProfileExportController extends Controller
                 return $user->position ?? 'Not provided';
             case 'created_at':
                 return $user->created_at->format('Y-m-d');
+            case 'work_history':
+                // For CSV/Excel, just return a summary count
+                return $user->workHistory()->count() . ' employment records';
+            case 'training_records':
+                // For CSV/Excel, just return a summary count
+                return $user->trainingRecords()->count() . ' training records';
             default:
                 return '';
         }

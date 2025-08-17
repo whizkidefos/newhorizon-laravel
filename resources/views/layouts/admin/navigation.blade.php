@@ -26,6 +26,9 @@
                     <x-nav-link :href="route('admin.courses.index')" :active="request()->routeIs('admin.courses.*')">
                         Courses
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.content.index')" :active="request()->routeIs('admin.content.*')">
+                        Content
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -95,6 +98,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('admin.courses.index')" :active="request()->routeIs('admin.courses.*')">
                 Courses
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.content.index')" :active="request()->routeIs('admin.content.*')">
+                Content
             </x-responsive-nav-link>
         </div>
 

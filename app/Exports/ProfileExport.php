@@ -23,7 +23,7 @@ class ProfileExport implements FromCollection, WithHeadings, WithMapping, WithSt
     {
         $this->user = $user;
         $this->columns = !empty($columns) ? $columns : [
-            'id', 'first_name', 'last_name', 'email', 'username', 'mobile_number',
+            'profile_photo', 'id', 'first_name', 'last_name', 'email', 'username', 'mobile_number',
             'job_role', 'date_of_birth', 'gender', 'national_insurance_number',
             'nationality', 'address', 'created_at'
         ];
@@ -45,6 +45,7 @@ class ProfileExport implements FromCollection, WithHeadings, WithMapping, WithSt
         $headers = [];
         $headerMap = [
             'id' => 'ID',
+            'profile_photo' => 'Profile Picture',
             'first_name' => 'First Name',
             'last_name' => 'Last Name',
             'email' => 'Email',
@@ -86,6 +87,9 @@ class ProfileExport implements FromCollection, WithHeadings, WithMapping, WithSt
             switch ($column) {
                 case 'id':
                     $data[] = $user->id;
+                    break;
+                case 'profile_photo':
+                    $data[] = $user->profile_photo ? 'Available' : 'Not provided';
                     break;
                 case 'first_name':
                     $data[] = $user->first_name;

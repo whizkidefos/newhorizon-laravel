@@ -12,6 +12,9 @@
             margin: 0;
             padding: 20px;
         }
+        img {
+            max-width: 100%;
+        }
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -66,14 +69,24 @@
 </head>
 <body>
     <div class="header">
-        <h1>Profile Information</h1>
-        <p>{{ $user->first_name }} {{ $user->last_name }} - {{ $timestamp }}</p>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <h1>Profile Information</h1>
+                <p>{{ $user->first_name }} {{ $user->last_name }} - {{ $timestamp }}</p>
+            </div>
+            @if(isset($profileImageBase64) && $profileImageBase64)
+            <div style="width: 100px; height: 100px; overflow: hidden; border-radius: 50%; border: 3px solid #4F46E5;">
+                <img src="data:image/jpeg;base64,{{ $profileImageBase64 }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Profile Photo">
+            </div>
+            @endif
+        </div>
     </div>
 
     @php
         $personalFields = ['first_name', 'last_name', 'email', 'username', 'mobile_number', 'date_of_birth', 'gender'];
         $professionalFields = ['job_role', 'national_insurance_number', 'nationality', 'right_to_work_uk', 'has_enhanced_dbs', 'has_criminal_convictions'];
         $otherFields = ['address', 'employee_id', 'department', 'position', 'created_at'];
+        $additionalSections = ['work_history', 'training_records'];
         
         $headerMap = [
             'id' => 'ID',
@@ -95,6 +108,8 @@
             'department' => 'Department',
             'position' => 'Position',
             'created_at' => 'Account Created',
+            'work_history' => 'Work History',
+            'training_records' => 'Training Records',
         ];
     @endphp
 
@@ -144,6 +159,55 @@
                         <td>{{ $data[$column] }}</td>
                     </tr>
                 @endif
+            @endforeach
+        </table>
+    </div>
+    @endif
+
+    <!-- Work History Section -->
+    @if(in_array('work_history', $columns) && isset($workHistory) && $workHistory->count() > 0)
+    <div class="profile-section">
+        <h2>Work History</h2>
+        <table class="profile-data">
+            <tr>
+                <th style="text-align: left; padding: 8px; background-color: #f2f2f2;">Company</th>
+                <th style="text-align: left; padding: 8px; background-color: #f2f2f2;">Position</th>
+                <th style="text-align: left; padding: 8px; background-color: #f2f2f2;">Period</th>
+            </tr>
+            @foreach($workHistory as $work)
+            <tr>
+                <td style="padding: 8px;">{{ $work->company_name }}</td>
+                <td style="padding: 8px;">{{ $work->position }}</td>
+                <td style="padding: 8px;">
+                    {{ $work->start_date->format('M Y') }} - 
+                    {{ $work->end_date ? $work->end_date->format('M Y') : 'Present' }}
+                </td>
+            </tr>
+            @endforeach
+        </table>
+    </div>
+    @endif
+
+    <!-- Training Records Section -->
+    @if(in_array('training_records', $columns) && isset($trainingRecords) && $trainingRecords->count() > 0)
+    <div class="profile-section">
+        <h2>Training Records</h2>
+        <table class="profile-data">
+            <tr>
+                <th style="text-align: left; padding: 8px; background-color: #f2f2f2;">Training Name</th>
+                <th style="text-align: left; padding: 8px; background-color: #f2f2f2;">Type</th>
+                <th style="text-align: left; padding: 8px; background-color: #f2f2f2;">Status</th>
+                <th style="text-align: left; padding: 8px; background-color: #f2f2f2;">Completion Date</th>
+                <th style="text-align: left; padding: 8px; background-color: #f2f2f2;">Expiry Date</th>
+            </tr>
+            @foreach($trainingRecords as $training)
+            <tr>
+                <td style="padding: 8px;">{{ $training->training_name }}</td>
+                <td style="padding: 8px;">{{ $training->type }}</td>
+                <td style="padding: 8px;">{{ $training->passed ? 'Passed' : 'Not Passed' }}</td>
+                <td style="padding: 8px;">{{ $training->completion_date ? $training->completion_date->format('d M Y') : 'N/A' }}</td>
+                <td style="padding: 8px;">{{ $training->expiry_date ? $training->expiry_date->format('d M Y') : 'N/A' }}</td>
+            </tr>
             @endforeach
         </table>
     </div>
